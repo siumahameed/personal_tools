@@ -1,0 +1,221 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-6 flex items-start justify-between flex-wrap gap-4">
+    <div>
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-purple-500/40 flex items-center justify-center text-lg">⚙️</div>
+            <p class="text-xs text-purple-400 uppercase tracking-widest font-semibold">Configuration</p>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Profile</h1>
+        <p class="text-surface-400 text-sm mt-1.5 max-w-2xl">
+            Your freelancer profile &mdash; used for skill matching and outreach personalization
+        </p>
+    </div>
+</div>
+
+<div id="status-bar" class="hidden mb-6 glass rounded-xl p-4 border flex items-center gap-3"></div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-surface-800 flex items-center gap-3 bg-gradient-to-r from-surface-800/30 to-transparent">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500/30 to-purple-500/30 border border-surface-700 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-primary-300" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+                </div>
+                <h2 class="text-sm font-semibold text-surface-100">Your Details</h2>
+            </div>
+            <div class="p-5">
+                <form id="profile-form" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">Name</label>
+                            <input type="text" name="name" value="{{ profile.name if profile else '' }}"
+                                   class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition"
+                                   placeholder="Your full name">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">Title</label>
+                            <input type="text" name="title" value="{{ profile.title if profile else '' }}"
+                                   class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition"
+                                   placeholder="e.g. Data Analyst & ML Engineer">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">Location</label>
+                            <input type="text" name="location" value="{{ profile.location if profile else 'Remote' }}"
+                                   class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">Experience (years)</label>
+                            <input type="number" name="experience_years" value="{{ profile.experience_years if profile else 0 }}"
+                                   class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">Summary</label>
+                        <textarea name="summary" rows="3"
+                                  class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition"
+                                  placeholder="Briefly describe yourself">{{ profile.summary if profile else '' }}</textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">
+                            Skills <span class="text-surface-600 font-normal normal-case">(comma-separated)</span>
+                        </label>
+                        <input type="text" name="skills" value="{{ profile.skills|join(', ') if profile and profile.skills else '' }}"
+                               placeholder="Python, Scikit-learn, Pandas, SQL, FastAPI"
+                               class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">
+                            Portfolio URLs <span class="text-surface-600 font-normal normal-case">(comma-separated)</span>
+                        </label>
+                        <input type="text" name="portfolio_urls" value="{{ profile.portfolio_urls|join(', ') if profile and profile.portfolio_urls else '' }}"
+                               placeholder="https://github.com/yourname, https://linkedin.com/in/yourname"
+                               class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium text-surface-400 mb-1.5 uppercase tracking-wide">
+                            Preferred Roles <span class="text-surface-600 font-normal normal-case">(comma-separated)</span>
+                        </label>
+                        <input type="text" name="preferred_roles" value="{{ profile.preferred_roles|join(', ') if profile and profile.preferred_roles else '' }}"
+                               placeholder="Data Analyst, ML Engineer, BI Developer"
+                               class="w-full bg-surface-900/60 border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl px-4 py-2.5 text-sm placeholder-surface-500 transition">
+                    </div>
+
+                    <div class="pt-2">
+                        <button type="submit"
+                                class="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 hover:from-primary-500 hover:via-purple-500 hover:to-pink-500 text-white text-sm rounded-xl px-6 py-2.5 font-semibold transition shadow-lg shadow-primary-500/20 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/></svg>
+                            Save Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-surface-800 flex items-center gap-3 bg-gradient-to-r from-surface-800/30 to-transparent">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/30 to-cyan-500/30 border border-surface-700 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <h2 class="text-sm font-semibold text-surface-100">Search Configuration</h2>
+            </div>
+            <div class="p-5">
+                <p class="text-sm text-surface-400 mb-4 leading-relaxed">
+                    Edit <code class="bg-surface-900 border border-surface-700 px-2 py-0.5 rounded text-xs text-primary-300">app/discovery/queries.yml</code> to change what the web search looks for.
+                </p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">general</strong> <span class="text-surface-500">— Company-focused queries</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">individual_clients</strong> <span class="text-surface-500">— People seeking freelancers</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">small_business</strong> <span class="text-surface-500">— Small business opportunities</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">regional</strong> <span class="text-surface-500">— Location-specific searches</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">job_boards</strong> <span class="text-surface-500">— Upwork, Freelancer, Indeed, etc.</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">linkedin</strong> <span class="text-surface-500">— LinkedIn pages & job listings</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">social</strong> <span class="text-surface-500">— Reddit, Quora, etc.</span>
+                    </div>
+                    <div class="bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                        <strong class="text-surface-200">directories</strong> <span class="text-surface-500">— Crunchbase, ZoomInfo</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-surface-800 flex items-center gap-3 bg-gradient-to-r from-surface-800/30 to-transparent">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/30 to-orange-500/30 border border-surface-700 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 6.464A1 1 0 106.464 5.05l-.707-.707a1 1 0 00-1.414 1.414l.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1z"/><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zM10 18a8 8 0 100-16 8 8 0 000 16zm0-2a6 6 0 110-12 6 6 0 010 12z"/></svg>
+                </div>
+                <h2 class="text-sm font-semibold text-surface-100">Tips</h2>
+            </div>
+            <div class="p-5 space-y-3 text-sm text-surface-300 leading-relaxed">
+                <div class="flex gap-2">
+                    <span class="text-primary-400 shrink-0">→</span>
+                    <p><strong class="text-surface-100">Skills</strong> drive the matching engine. List every tool and technology you know.</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-primary-400 shrink-0">→</span>
+                    <p><strong class="text-surface-100">Portfolio URLs</strong> are included in cold emails. Add your GitHub, LinkedIn, and portfolio site.</p>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-primary-400 shrink-0">→</span>
+                    <p><strong class="text-surface-100">Preferred Roles</strong> help the scraper focus on relevant opportunities.</p>
+                </div>
+                <p class="text-surface-600 text-xs pt-3 border-t border-surface-800">Profile is stored locally in the database. Never sent anywhere.</p>
+            </div>
+        </div>
+
+        <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+            <div class="px-5 py-3.5 border-b border-surface-800 flex items-center gap-3 bg-gradient-to-r from-surface-800/30 to-transparent">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/30 to-teal-500/30 border border-surface-700 flex items-center justify-center">
+                    <svg class="w-4 h-4 text-emerald-300" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+                </div>
+                <h2 class="text-sm font-semibold text-surface-100">Quick Stats</h2>
+            </div>
+            <div class="p-5 space-y-2.5 text-sm">
+                {% if profile %}
+                <div class="flex items-center justify-between bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                    <span class="text-surface-400 text-xs uppercase tracking-wide">Skills listed</span>
+                    <span class="font-bold text-primary-300">{{ profile.skills|length if profile.skills else 0 }}</span>
+                </div>
+                <div class="flex items-center justify-between bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                    <span class="text-surface-400 text-xs uppercase tracking-wide">Portfolio links</span>
+                    <span class="font-bold text-primary-300">{{ profile.portfolio_urls|length if profile.portfolio_urls else 0 }}</span>
+                </div>
+                <div class="flex items-center justify-between bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2">
+                    <span class="text-surface-400 text-xs uppercase tracking-wide">Experience</span>
+                    <span class="font-bold text-primary-300">{{ profile.experience_years or 0 }} years</span>
+                </div>
+                {% else %}
+                <div class="bg-surface-900/60 border border-dashed border-surface-700 rounded-lg px-4 py-6 text-center text-surface-500 text-sm">
+                    Fill in your profile to see stats here.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('profile-form')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const bar = document.getElementById('status-bar');
+    bar.className = 'mb-6 glass rounded-xl p-4 border border-amber-700/50 flex items-center gap-3';
+    bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm">Saving...</span>';
+    bar.classList.remove('hidden');
+    const form = new FormData(this);
+    const data = Object.fromEntries(form.entries());
+    try {
+        const r = await fetch('/api/profile/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        const d = await r.json();
+        bar.className = 'mb-6 glass rounded-xl p-4 border border-emerald-700/50 flex items-center gap-3';
+        bar.innerHTML = '<span class="text-emerald-400 shrink-0">✓</span> <span class="text-emerald-300 text-sm">' + d.message + '</span>';
+        setTimeout(() => { bar.classList.add('hidden'); location.reload(); }, 1500);
+    } catch (e) {
+        bar.className = 'mb-6 glass rounded-xl p-4 border border-red-700/50 flex items-center gap-3';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">Failed: ' + e.message + '</span>';
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Header -->
+<div class="mb-8">
+    <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+            <p class="text-xs text-surface-500 uppercase tracking-widest font-semibold mb-2">Welcome back</p>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight">
+                {% if profile and profile.name %}
+                    Hey, <span class="gradient-text">{{ profile.name.split()[0] }}</span> 👋
+                {% else %}
+                    <span class="gradient-text">leadOS</span>
+                {% endif %}
+            </h1>
+            <p class="text-surface-400 text-sm mt-2 max-w-xl leading-relaxed">
+                Find companies that need your skills, get decision-makers' emails, and discover researchers who could be your collaborators.
+            </p>
+        </div>
+        {% if task_status and task_status.status == 'running' %}
+        <div class="flex items-center gap-2 bg-primary-500/10 border border-primary-500/30 rounded-full px-3 py-1.5">
+            <span class="w-2 h-2 rounded-full bg-primary-400 pulse-dot text-primary-400"></span>
+            <span class="text-xs text-primary-300 font-medium">{{ task_status.message or task_status.name }}</span>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="status-bar" class="hidden mb-6 glass border border-amber-700/50 rounded-xl p-4 flex items-center gap-3"></div>
+
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-8">
+    <a href="/prospects" class="stat-card glass rounded-2xl p-4 glow-primary border border-surface-800/80 block hover:border-primary-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-primary-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-primary-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-white">{{ stats.total_prospects }}</p>
+        <p class="text-xs text-surface-400 mt-1">Companies Found</p>
+    </a>
+
+    <a href="/prospects" class="stat-card glass rounded-2xl p-4 glow-amber border border-surface-800/80 block hover:border-amber-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            </div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-amber-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-amber-400">{{ stats.with_contacts }}</p>
+        <p class="text-xs text-surface-400 mt-1">With Contacts</p>
+    </a>
+
+    <a href="/drafts" class="stat-card glass rounded-2xl p-4 glow-emerald border border-surface-800/80 block hover:border-emerald-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-emerald-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold text-emerald-400">{{ stats.total_drafts }}</p>
+        <p class="text-xs text-surface-400 mt-1">Drafts Ready</p>
+    </a>
+
+    <a href="/research/bd" class="stat-card glass rounded-2xl p-4 glow-cyan border border-surface-800/80 block hover:border-emerald-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-red-500/20 flex items-center justify-center text-base">🇧🇩</div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-emerald-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-red-400 bg-clip-text text-transparent">{{ stats.bd_research }}</p>
+        <p class="text-xs text-surface-400 mt-1">BD Researchers</p>
+    </a>
+
+    <a href="/research/global" class="stat-card glass rounded-2xl p-4 glow-cyan border border-surface-800/80 block hover:border-cyan-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center text-base">🌍</div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">{{ stats.global_research }}</p>
+        <p class="text-xs text-surface-400 mt-1">Global Researchers</p>
+    </a>
+
+    <a href="/research/bd#manual" class="stat-card glass rounded-2xl p-4 glow-amber border border-surface-800/80 block hover:border-amber-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-yellow-500/20 flex items-center justify-center text-base">📋</div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-amber-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">{{ stats.manual_research }}</p>
+        <p class="text-xs text-surface-400 mt-1">Manual Imports</p>
+    </a>
+</div>
+
+<!-- Two main columns: Clients pipeline + Research -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+    <!-- Clients Pipeline -->
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+        <div class="px-5 py-4 border-b border-surface-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white text-sm">💼</div>
+                <h2 class="text-sm font-semibold text-surface-100">Client Pipeline</h2>
+            </div>
+            <span class="text-xs text-surface-500">Find paying clients</span>
+        </div>
+        <div class="p-5">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-6 h-6 rounded-full {{ 'bg-emerald-500/30 text-emerald-400' if stats.total_prospects > 0 else 'bg-surface-800 text-surface-500' }} flex items-center justify-center text-xs font-bold">1</div>
+                    <span class="text-xs text-surface-300">Discover</span>
+                    {% if stats.total_prospects > 0 %}<svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>{% endif %}
+                </div>
+                <div class="flex-1 h-px bg-surface-800"></div>
+                <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-6 h-6 rounded-full {{ 'bg-emerald-500/30 text-emerald-400' if stats.with_contacts > 0 else 'bg-surface-800 text-surface-500' }} flex items-center justify-center text-xs font-bold">2</div>
+                    <span class="text-xs text-surface-300">Contacts</span>
+                </div>
+                <div class="flex-1 h-px bg-surface-800"></div>
+                <div class="flex items-center gap-1.5 flex-1">
+                    <div class="w-6 h-6 rounded-full {{ 'bg-emerald-500/30 text-emerald-400' if stats.total_drafts > 0 else 'bg-surface-800 text-surface-500' }} flex items-center justify-center text-xs font-bold">3</div>
+                    <span class="text-xs text-surface-300">Drafts</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="runAction('pipeline')" class="group bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl py-2.5 text-sm font-semibold transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
+                    Run Full Pipeline
+                </button>
+                <div class="grid grid-cols-4 gap-1.5">
+                    <button onclick="runAction('search')" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition">Discover</button>
+                    <button onclick="runAction('score')" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition">Score</button>
+                    <button onclick="runAction('find-contacts')" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition">Contacts</button>
+                    <button onclick="runAction('generate')" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition">Drafts</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Pipeline -->
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+        <div class="px-5 py-4 border-b border-surface-800 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 via-purple-500 to-pink-500 flex items-center justify-center text-white text-sm">🔬</div>
+                <h2 class="text-sm font-semibold text-surface-100">Research Collaborators</h2>
+            </div>
+            <span class="text-xs text-surface-500">Publish your first paper</span>
+        </div>
+        <div class="p-5">
+            <p class="text-xs text-surface-400 mb-4 leading-relaxed">
+                Find researchers &amp; students in ML, Deep Learning, AI, NLP, Computer Vision, Data Science &amp; related fields. Get their contact info, papers, and a fit score for collaboration.
+            </p>
+            <div class="grid grid-cols-1 gap-2">
+                <button onclick="runAction('research')" class="group bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 hover:from-primary-500 hover:via-purple-500 hover:to-pink-500 text-white rounded-xl py-2.5 text-sm font-semibold transition shadow-lg shadow-primary-500/20 flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+                    Find Research Collaborators
+                </button>
+                <div class="grid grid-cols-3 gap-1.5">
+                    <a href="/research/bd" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition text-center">🇧🇩 BD ({{ stats.bd_research }})</a>
+                    <a href="/research/global" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition text-center">🌍 Global ({{ stats.global_research }})</a>
+                    <button onclick="importCsv()" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 rounded-lg py-2 text-xs font-medium transition text-center">📋 CSV ({{ stats.manual_research }})</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sources + Activity -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-8">
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+        <div class="px-5 py-4 border-b border-surface-800 flex items-center gap-2">
+            <svg class="w-4 h-4 text-primary-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+            <h2 class="text-sm font-semibold">Lead Sources</h2>
+        </div>
+        <div class="p-5">
+            {% if source_stats %}
+            <div class="space-y-3">
+                {% for s in source_stats[:8] %}
+                <div class="flex items-center gap-3">
+                    <span class="w-2 h-2 rounded-full {{ s.color }} shrink-0"></span>
+                    <span class="text-sm text-surface-300 flex-1">{{ s.name }}</span>
+                    <span class="text-sm font-semibold text-surface-100 tabular-nums">{{ s.count }}</span>
+                    <div class="w-24 bg-surface-800 rounded-full h-1.5 overflow-hidden">
+                        <div class="rounded-full h-1.5 {{ s.bar }}" style="width: {{ s.pct }}%"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-6 text-surface-500">
+                <div class="text-3xl mb-2 opacity-50">📊</div>
+                <p class="text-sm">Run the pipeline to see sources</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden">
+        <div class="px-5 py-4 border-b border-surface-800 flex items-center gap-2">
+            <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+            <h2 class="text-sm font-semibold">Recent Activity</h2>
+        </div>
+        <div class="p-5">
+            {% if task_history %}
+            <div class="space-y-3">
+                {% for h in task_history[:5] %}
+                <div class="flex items-center gap-3 text-sm">
+                    {% if h.status == 'completed' %}
+                    <div class="w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                    </div>
+                    {% elif h.status == 'failed' %}
+                    <div class="w-6 h-6 rounded-full bg-red-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-3 h-3 text-red-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+                    </div>
+                    {% else %}
+                    <div class="w-6 h-6 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0">
+                        <svg class="w-3 h-3 text-amber-400 animate-spin" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+                    </div>
+                    {% endif %}
+                    <span class="text-surface-200 flex-1">{{ h.name }}</span>
+                    <span class="text-xs text-surface-600">{{ h.finished_at[:10] if h.finished_at else '' }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-6 text-surface-500">
+                <div class="text-3xl mb-2 opacity-50">⏱️</div>
+                <p class="text-sm">No activity yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if recent_prospects %}
+<div class="glass rounded-2xl border border-surface-800/80 overflow-hidden mb-8">
+    <div class="flex items-center justify-between px-5 py-4 border-b border-surface-800">
+        <h2 class="text-sm font-semibold">Recent Prospects</h2>
+        <a href="/prospects" class="text-xs text-primary-400 hover:text-primary-300 flex items-center gap-1">
+            View all
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="text-xs text-surface-500 border-b border-surface-800 bg-surface-900/30">
+                    <th class="text-left px-5 py-3 font-medium">Company</th>
+                    <th class="text-left px-5 py-3 font-medium">Contact</th>
+                    <th class="text-left px-5 py-3 font-medium hidden sm:table-cell">Source</th>
+                    <th class="text-center px-5 py-3 font-medium">Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in recent_prospects %}
+                <tr class="border-b border-surface-800/40 hover:bg-surface-800/30 transition">
+                    <td class="px-5 py-3 font-medium text-surface-100">{{ p.company_name[:35] }}</td>
+                    <td class="px-5 py-3">
+                        {% if p.contact_name %}
+                        <span class="text-surface-300">{{ p.contact_name[:20] }}</span>
+                        {% elif p.email %}
+                        <span class="text-xs text-surface-500">{{ p.email[:25] }}</span>
+                        {% else %}
+                        <span class="text-xs text-surface-600">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-5 py-3 hidden sm:table-cell">
+                        <span class="text-xs bg-surface-800 text-surface-400 px-2 py-0.5 rounded">{{ p.source }}</span>
+                    </td>
+                    <td class="px-5 py-3 text-center">
+                        {% if p.relevance_score >= 70 %}
+                        <span class="inline-flex items-center gap-1 text-emerald-400 font-bold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            {{ p.relevance_score }}
+                        </span>
+                        {% elif p.relevance_score >= 40 %}
+                        <span class="inline-flex items-center gap-1 text-amber-400 font-bold">
+                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                            {{ p.relevance_score }}
+                        </span>
+                        {% elif p.relevance_score and p.relevance_score > 0 %}
+                        <span class="text-surface-500">{{ p.relevance_score }}</span>
+                        {% else %}
+                        <span class="text-surface-600">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+{% if not recent_prospects and stats.total_prospects == 0 %}
+<div class="glass rounded-2xl border-2 border-dashed border-surface-700 px-8 py-12 text-center">
+    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500/20 to-primary-500/20 flex items-center justify-center text-3xl mx-auto mb-4">🚀</div>
+    <p class="text-xl font-semibold mb-2 gradient-text">Find your first clients</p>
+    <p class="text-sm text-surface-400 mb-6 max-w-md mx-auto leading-relaxed">leadOS searches the web for companies that need data analysis &amp; ML, finds their decision-makers, and writes cold email drafts for you.</p>
+    <button onclick="runAction('pipeline')" class="bg-gradient-to-r from-emerald-600 to-emerald-500 hover:from-emerald-500 hover:to-emerald-400 text-white rounded-xl px-6 py-2.5 text-sm font-semibold transition shadow-lg shadow-emerald-500/30 inline-flex items-center gap-2">
+        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/></svg>
+        Run Full Pipeline
+    </button>
+</div>
+{% endif %}
+
+<script>
+{% if task_status and task_status.status == 'running' %}
+window.taskRunning = true;
+{% else %}
+window.taskRunning = false;
+{% endif %}
+
+async function importCsv() {
+    const bar = document.getElementById('status-bar');
+    bar.className = 'mb-6 glass border border-amber-700/50 rounded-xl p-4 flex items-center gap-3';
+    bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">Importing researchers from CSV...</span>';
+    bar.classList.remove('hidden');
+    try {
+        const r = await fetch('/api/research/import-csv', { method: 'POST' });
+        const d = await r.json();
+        if (d.status === 'ok') {
+            bar.className = 'mb-6 glass border border-emerald-700/50 rounded-xl p-4 flex items-center gap-3';
+            bar.innerHTML = '<span class="text-emerald-400 shrink-0">✓</span> <span class="text-emerald-300 text-sm font-medium">' + d.message + '</span>';
+        } else {
+            bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
+            bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm font-medium">' + d.message + '</span>';
+        }
+        setTimeout(() => location.reload(), 3000);
+    } catch (e) {
+        bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + e.message + '</span>';
+    }
+}
+
+async function runAction(action) {
+    const bar = document.getElementById('status-bar');
+    const labels = {
+        search: 'Discovering companies...',
+        score: 'Scoring companies...',
+        'find-contacts': 'Finding contacts...',
+        generate: 'Writing drafts...',
+        pipeline: 'Running full client pipeline...',
+        research: 'Finding research collaborators...'
+    };
+    bar.className = 'mb-6 glass border border-amber-700/50 rounded-xl p-4 flex items-center gap-3';
+    bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">' + (labels[action] || action) + '</span>';
+    bar.classList.remove('hidden');
+    try {
+        const r = await fetch('/api/run/' + action, { method: 'POST' });
+        const d = await r.json();
+        bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">' + d.message + '</span>';
+        window.taskRunning = true;
+        pollTaskStatus();
+    } catch (e) {
+        bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + e.message + '</span>';
+    }
+}
+
+let pollInterval = null;
+async function pollTaskStatus() {
+    if (pollInterval) return;
+    pollInterval = setInterval(async () => {
+        try {
+            const r = await fetch('/api/task-status');
+            const data = await r.json();
+            const bar = document.getElementById('status-bar');
+            const current = data.current;
+            if (!current || current.status !== 'running') {
+                clearInterval(pollInterval); pollInterval = null; window.taskRunning = false;
+                if (current) {
+                    const ok = current.status === 'completed';
+                    bar.className = 'mb-6 glass border ' + (ok ? 'border-emerald-700/50' : 'border-red-700/50') + ' rounded-xl p-4 flex items-center gap-3';
+                    bar.innerHTML = '<span class="' + (ok ? 'text-emerald-400' : 'text-red-400') + ' shrink-0">' + (ok ? '✓' : '✕') + '</span> <span class="' + (ok ? 'text-emerald-300' : 'text-red-300') + ' text-sm font-medium">' + (current.message || current.name + ' ' + current.status) + '</span>';
+                }
+                setTimeout(() => { location.reload(); }, 3000);
+                return;
+            }
+            bar.className = 'mb-6 glass border border-amber-700/50 rounded-xl p-4 flex items-center gap-3';
+            bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">' + (current.message || current.name) + '</span>';
+        } catch (e) { clearInterval(pollInterval); pollInterval = null; }
+    }, 3000);
+}
+if (window.taskRunning) { pollTaskStatus(); }
+</script>
+{% endblock %}

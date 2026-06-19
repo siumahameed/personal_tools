@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>leadOS — Client & Research Prospecting</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {50:'#eef2ff',100:'#e0e7ff',200:'#c7d2fe',300:'#a5b4fc',400:'#818cf8',500:'#6366f1',600:'#4f46e5',700:'#4338ca',800:'#3730a3',900:'#312e81'},
+                        surface: {50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a',950:'#020617'},
+                        emerald: {50:'#ecfdf5',100:'#d1fae5',200:'#a7f3d0',300:'#6ee7b7',400:'#34d399',500:'#10b981',600:'#059669',700:'#047857',800:'#065f46',900:'#064e3b'},
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .gradient-text { background: linear-gradient(135deg, #818cf8 0%, #a78bfa 50%, #f472b6 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+        .gradient-border { position: relative; }
+        .gradient-border::before { content: ''; position: absolute; inset: 0; padding: 1px; border-radius: inherit; background: linear-gradient(135deg, rgba(129,140,248,0.4), rgba(167,139,250,0.4), rgba(244,114,182,0.4)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; }
+        .glass { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .glow-primary { box-shadow: 0 0 0 1px rgba(99,102,241,0.3), 0 4px 24px -2px rgba(99,102,241,0.25); }
+        .glow-emerald { box-shadow: 0 0 0 1px rgba(16,185,129,0.3), 0 4px 24px -2px rgba(16,185,129,0.25); }
+        .glow-amber { box-shadow: 0 0 0 1px rgba(245,158,11,0.3), 0 4px 24px -2px rgba(245,158,11,0.2); }
+        .glow-cyan { box-shadow: 0 0 0 1px rgba(6,182,212,0.3), 0 4px 24px -2px rgba(6,182,212,0.25); }
+        .nav-link { position: relative; }
+        .nav-link::after { content: ''; position: absolute; left: 0.75rem; right: 0.75rem; bottom: 0.25rem; height: 2px; background: linear-gradient(90deg, #818cf8, #a78bfa); border-radius: 2px; transform: scaleX(0); transition: transform 0.2s; }
+        .nav-link:hover::after, .nav-link.active::after { transform: scaleX(1); }
+        .dropdown-menu { transform-origin: top right; animation: dropdownIn 0.15s ease-out; }
+        @keyframes dropdownIn { from { opacity: 0; transform: scale(0.95) translateY(-4px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .pulse-dot { position: relative; }
+        .pulse-dot::before { content: ''; position: absolute; inset: -2px; border-radius: 50%; background: currentColor; opacity: 0.4; animation: pulse 2s ease-out infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 0.4; } 100% { transform: scale(2.5); opacity: 0; } }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-surface-950 via-surface-950 to-surface-900 text-surface-100 min-h-screen antialiased">
+
+    <!-- Subtle background gradient -->
+    <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-primary-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 -left-40 w-96 h-96 bg-purple-600/10 rounded-full blur-3xl"></div>
+        <div class="absolute bottom-0 right-1/3 w-96 h-96 bg-emerald-600/5 rounded-full blur-3xl"></div>
+    </div>
+
+    <nav class="glass border-b border-surface-800/80 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-14">
+            <a href="/" class="flex items-center gap-2 group">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-primary-500 via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xs shadow-lg shadow-primary-500/30">L</div>
+                <span class="text-base font-bold gradient-text tracking-tight group-hover:opacity-80 transition">leadOS</span>
+            </a>
+            <div class="flex items-center gap-0.5">
+                <a href="/" class="nav-link px-3 py-1.5 text-sm rounded-lg transition {{ 'text-white active' if request.url.path == '/' else 'text-surface-400 hover:text-surface-200' }}">Home</a>
+                <a href="/prospects" class="nav-link px-3 py-1.5 text-sm rounded-lg transition {{ 'text-white active' if request.url.path == '/prospects' else 'text-surface-400 hover:text-surface-200' }}">Prospects</a>
+
+                <!-- Research Dropdown -->
+                <div class="relative" id="research-dropdown">
+                    <button onclick="toggleResearch()" class="nav-link px-3 py-1.5 text-sm rounded-lg transition flex items-center gap-1 {{ 'text-white active' if request.url.path.startswith('/research/') else 'text-surface-400 hover:text-surface-200' }}">
+                        <span>Research</span>
+                        <svg class="w-3 h-3 transition-transform" id="research-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div id="research-menu" class="hidden absolute right-0 mt-2 w-72 bg-surface-800 border border-surface-700 rounded-xl shadow-2xl shadow-black/50 z-50 dropdown-menu overflow-hidden">
+                        <div class="px-4 py-3 border-b border-surface-700/80">
+                            <p class="text-xs font-semibold text-surface-500 uppercase tracking-wider">Find collaborators</p>
+                        </div>
+                        <a href="/research/bd" class="flex items-start gap-3 px-4 py-3 hover:bg-surface-700/50 transition border-b border-surface-700/40">
+                            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500/20 to-emerald-600/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M3.5 2.75a.25.25 0 01.25-.25h12.5a.25.25 0 01.25.25v14.5a.25.25 0 01-.25.25h-6.5v-1.5h-2.5v1.5h-3.5a.25.25 0 01-.25-.25V2.75z"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-surface-100">🇧🇩 Bangladesh</p>
+                                <p class="text-xs text-surface-400 leading-snug mt-0.5">BD faculty, students & researchers in your fields</p>
+                            </div>
+                        </a>
+                        <a href="/research/global" class="flex items-start gap-3 px-4 py-3 hover:bg-surface-700/50 transition">
+                            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shrink-0">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .2.08.39.22.53l3 3a.75.75 0 101.06-1.06L10.75 9.69V5z" clip-rule="evenodd"/></svg>
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-surface-100">🌍 Worldwide</p>
+                                <p class="text-xs text-surface-400 leading-snug mt-0.5">Global researchers, PhD students, RAs needing help</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+
+                <a href="/drafts" class="nav-link px-3 py-1.5 text-sm rounded-lg transition {{ 'text-white active' if request.url.path == '/drafts' else 'text-surface-400 hover:text-surface-200' }}">Drafts</a>
+                <a href="/settings" class="nav-link px-3 py-1.5 text-sm rounded-lg transition {{ 'text-white active' if request.url.path == '/settings' else 'text-surface-400 hover:text-surface-200' }}">Settings</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="/static/script.js"></script>
+    <script>
+        function toggleResearch() {
+            const menu = document.getElementById('research-menu');
+            const chevron = document.getElementById('research-chevron');
+            menu.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+        document.addEventListener('click', (e) => {
+            const dd = document.getElementById('research-dropdown');
+            if (dd && !dd.contains(e.target)) {
+                document.getElementById('research-menu')?.classList.add('hidden');
+                document.getElementById('research-chevron')?.classList.remove('rotate-180');
+            }
+        });
+    </script>
+</body>
+</html>

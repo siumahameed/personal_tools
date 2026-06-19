@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-6 flex items-start justify-between flex-wrap gap-4">
+    <div>
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-500/40 flex items-center justify-center text-lg">🌍</div>
+            <p class="text-xs text-cyan-400 uppercase tracking-widest font-semibold">Research Collaborators</p>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Worldwide Research Leads</h1>
+        <p class="text-surface-400 text-sm mt-1.5 max-w-2xl">
+            Global researchers &amp; students in Machine Learning, Deep Learning, AI, NLP, Computer Vision, Data Science &amp; related fields.
+            <span class="text-surface-500">Ranked by best match for your skills.</span>
+        </p>
+    </div>
+    <div class="flex gap-2">
+        <button onclick="runScrape('research')" class="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 hover:from-primary-500 hover:via-purple-500 hover:to-pink-500 text-white text-sm rounded-xl px-4 py-2 font-semibold transition shadow-lg shadow-primary-500/20 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
+            Find More
+        </button>
+        <button onclick="generateOutreach()" class="glass border border-surface-700 hover:border-emerald-500/50 text-surface-200 hover:text-emerald-300 text-sm rounded-xl px-4 py-2 font-medium transition flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            Generate Outreach
+        </button>
+    </div>
+</div>
+
+<div id="scrape-status" class="hidden mb-6 glass border border-amber-700/50 rounded-xl p-4 text-sm text-amber-300"></div>
+
+{% if leads %}
+<div class="space-y-4">
+    {% for lead in leads %}
+    {% set current = lead.current_fields or [] %}
+    {% set past = lead.past_fields or [] %}
+    {% set fields = lead.research_fields or [] %}
+    {% set papers = lead.recent_papers or [] %}
+    {% set all_emails = lead.all_emails or [] %}
+    {% set has_contact = lead.contact_email or lead.linkedin_url or lead.profile_url or lead.contact_phone or lead.github_url or lead.google_scholar_url or lead.orcid_url %}
+    {% set score = lead.relevance_score or 0 %}
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden hover:border-surface-700 transition group">
+        <div class="px-5 py-4 border-b border-surface-800 flex items-start justify-between flex-wrap gap-3 bg-gradient-to-r from-surface-800/40 to-transparent">
+            <div class="flex items-start gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/30 to-primary-500/30 border border-surface-700 flex items-center justify-center text-sm font-bold text-surface-200 shrink-0">
+                    {{ lead.name[:2]|upper if lead.name else '??' }}
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-surface-100 truncate">{{ lead.name }}</h3>
+                    <div class="flex items-center gap-1.5 flex-wrap text-xs text-surface-400 mt-0.5">
+                        {% if lead.title %}<span>{{ lead.title }}</span>{% endif %}
+                        {% if lead.institution %}<span class="text-surface-600">·</span><span>{{ lead.institution }}</span>{% endif %}
+                        {% if lead.country %}<span class="text-surface-600">·</span><span class="text-emerald-400">{{ lead.country }}</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                {% if has_contact %}
+                <span class="text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">Contact found</span>
+                {% else %}
+                <span class="text-xs bg-surface-800 text-surface-500 px-2 py-0.5 rounded-full">No contact</span>
+                {% endif %}
+                <span class="text-xs bg-surface-800 text-surface-400 px-2 py-0.5 rounded">{{ lead.source|replace('_',' ')|title }}</span>
+                <div class="flex items-center gap-1 bg-surface-900 px-2.5 py-1 rounded-lg border border-surface-700">
+                    <span class="w-1.5 h-1.5 rounded-full {{ 'bg-emerald-400' if score >= 70 else 'bg-amber-400' if score >= 40 else 'bg-surface-500' }}"></span>
+                    <span class="text-sm font-bold {{ 'text-emerald-400' if score >= 70 else 'text-amber-400' if score >= 40 else 'text-surface-400' }}">{{ score }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-5 grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <div class="lg:col-span-3 space-y-4">
+                {% if lead.department or lead.office_address %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {% if lead.department %}
+                    <div>
+                        <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1">Department</div>
+                        <p class="text-surface-200 text-sm">{{ lead.department }}</p>
+                    </div>
+                    {% endif %}
+                    {% if lead.office_address %}
+                    <div>
+                        <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1">Office</div>
+                        <p class="text-surface-300 text-sm">{{ lead.office_address }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% if current %}
+                <div>
+                    <div class="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest mb-1.5">Currently Working On</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for f in current[:10] %}
+                        <span class="text-xs bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded-full">{{ f }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if past %}
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1.5">Previously Worked On</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for f in past[:10] %}
+                        <span class="text-xs bg-surface-800 text-surface-400 border border-surface-700 px-2 py-0.5 rounded-full">{{ f }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if fields and not current and not past %}
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1.5">Research Fields</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% for f in fields[:10] %}
+                        <span class="text-xs bg-primary-500/15 text-primary-300 border border-primary-500/20 px-2 py-0.5 rounded-full">{{ f }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if papers %}
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1.5">Recent Papers</div>
+                    <ul class="space-y-1.5 text-sm text-surface-300">
+                        {% for p in papers[:5] %}
+                        <li class="leading-snug flex gap-2"><span class="text-surface-600 shrink-0">•</span><span class="text-surface-200">{{ p }}</span></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                {% if lead.bio %}
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-1">About</div>
+                    <p class="text-surface-400 text-sm leading-relaxed">{{ lead.bio[:400] }}{% if lead.bio|length > 400 %}&hellip;{% endif %}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="lg:col-span-2 space-y-3">
+                {% if lead.why_good_fit %}
+                <div class="relative overflow-hidden bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent border border-emerald-500/30 rounded-xl p-4">
+                    <div class="absolute top-2 right-2 text-emerald-400/30 text-2xl">✨</div>
+                    <div class="text-[10px] font-semibold text-emerald-400 uppercase tracking-widest mb-1.5">Why this is a good fit for you</div>
+                    <p class="text-surface-100 text-sm leading-relaxed">{{ lead.why_good_fit }}</p>
+                </div>
+                {% endif %}
+
+                <div class="bg-surface-900/60 border border-surface-800 rounded-xl p-3.5 space-y-2.5">
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest">Contact Details</div>
+
+                    {% if lead.contact_email %}
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="text-surface-500 w-14 shrink-0">Email</span>
+                        <a href="mailto:{{ lead.contact_email }}" class="text-emerald-400 hover:text-emerald-300 break-all">{{ lead.contact_email }}</a>
+                    </div>
+                    {% endif %}
+                    {% if all_emails|length > 1 %}
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="text-surface-500 w-14 shrink-0">More</span>
+                        <div class="flex flex-wrap gap-1 min-w-0">
+                            {% for e in all_emails %}{% if e != lead.contact_email %}
+                            <a href="mailto:{{ e }}" class="text-surface-300 hover:text-emerald-300 bg-surface-800 px-1.5 py-0.5 rounded text-[11px] break-all">{{ e }}</a>
+                            {% endif %}{% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if lead.contact_phone %}
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="text-surface-500 w-14 shrink-0">Phone</span>
+                        <a href="tel:{{ lead.contact_phone }}" class="text-surface-200 hover:text-emerald-300">{{ lead.contact_phone }}</a>
+                    </div>
+                    {% endif %}
+                    {% if lead.personal_website %}
+                    <div class="flex items-start gap-2 text-xs">
+                        <span class="text-surface-500 w-14 shrink-0">Website</span>
+                        <a href="{{ lead.personal_website }}" target="_blank" class="text-primary-400 hover:text-primary-300 break-all">{{ lead.personal_website }}</a>
+                    </div>
+                    {% endif %}
+
+                    <div class="flex flex-wrap gap-1.5 pt-1">
+                        {% if lead.contact_email %}
+                        <a href="mailto:{{ lead.contact_email }}" class="text-[11px] bg-emerald-600 hover:bg-emerald-500 text-white px-2.5 py-1 rounded-md transition font-medium">Email</a>
+                        {% endif %}
+                        {% if lead.linkedin_url %}
+                        <a href="{{ lead.linkedin_url }}" target="_blank" class="text-[11px] bg-blue-600 hover:bg-blue-500 text-white px-2.5 py-1 rounded-md transition font-medium">LinkedIn</a>
+                        {% endif %}
+                        {% if lead.google_scholar_url %}
+                        <a href="{{ lead.google_scholar_url }}" target="_blank" class="text-[11px] bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-md transition font-medium">Scholar</a>
+                        {% endif %}
+                        {% if lead.orcid_url %}
+                        <a href="{{ lead.orcid_url }}" target="_blank" class="text-[11px] bg-green-700 hover:bg-green-600 text-white px-2.5 py-1 rounded-md transition font-medium">ORCID</a>
+                        {% endif %}
+                        {% if lead.researchgate_url %}
+                        <a href="{{ lead.researchgate_url }}" target="_blank" class="text-[11px] bg-teal-700 hover:bg-teal-600 text-white px-2.5 py-1 rounded-md transition font-medium">ResearchGate</a>
+                        {% endif %}
+                        {% if lead.github_url %}
+                        <a href="{{ lead.github_url }}" target="_blank" class="text-[11px] bg-surface-800 hover:bg-surface-700 text-surface-100 border border-surface-700 px-2.5 py-1 rounded-md transition font-medium">GitHub</a>
+                        {% endif %}
+                        {% if lead.twitter_url %}
+                        <a href="{{ lead.twitter_url }}" target="_blank" class="text-[11px] bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1 rounded-md transition font-medium">Twitter</a>
+                        {% endif %}
+                        {% if lead.profile_url %}
+                        <a href="{{ lead.profile_url }}" target="_blank" class="text-[11px] bg-surface-800 hover:bg-surface-700 text-surface-200 px-2.5 py-1 rounded-md transition font-medium border border-surface-700">Profile ↗</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if lead.relevance_reason %}
+                <div class="text-xs text-surface-500 leading-relaxed bg-surface-900/50 rounded-lg p-2.5">
+                    <span class="font-semibold text-surface-400">Match signals:</span> {{ lead.relevance_reason[:200] }}
+                </div>
+                {% endif %}
+
+                {% if lead.outreach_draft %}
+                <details class="bg-surface-900/50 border border-surface-800 rounded-xl text-sm group/draft">
+                    <summary class="cursor-pointer text-primary-400 hover:text-primary-300 text-xs font-medium px-3 py-2.5 flex items-center gap-1.5">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8"/></svg>
+                        View outreach draft
+                    </summary>
+                    <pre class="whitespace-pre-wrap text-surface-300 text-xs mt-1 font-sans leading-relaxed px-3 pb-3">{{ lead.outreach_draft }}</pre>
+                </details>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="glass rounded-2xl border-2 border-dashed border-surface-700 px-8 py-16 text-center">
+    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center text-4xl mx-auto mb-4">🌍</div>
+    <p class="text-xl font-semibold mb-2 gradient-text">No global research leads yet</p>
+    <p class="text-sm text-surface-400 mb-6 max-w-md mx-auto leading-relaxed">Click the button to find global researchers &amp; students in ML, DL, AI, NLP, CV, Data Science and related fields.</p>
+    <button onclick="runScrape('research')" class="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 hover:from-primary-500 hover:via-purple-500 hover:to-pink-500 text-white text-sm rounded-xl px-5 py-2.5 font-semibold transition shadow-lg shadow-primary-500/20 inline-flex items-center gap-2">
+        Find Global Researchers
+    </button>
+</div>
+{% endif %}
+
+<script>
+async function runScrape(type) {
+    const statusDiv = document.getElementById('scrape-status');
+    statusDiv.classList.remove('hidden');
+    statusDiv.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full inline-block mr-2"></div>Searching for researchers — this takes 1–3 minutes...';
+    try {
+        const resp = await fetch('/api/run/research', {method: 'POST'});
+        const data = await resp.json();
+        statusDiv.innerHTML = '✓ ' + data.message + ' <a href="javascript:location.reload()" class="text-primary-400 ml-2 underline">Refresh in 60s</a>';
+        setTimeout(() => location.reload(), 60000);
+    } catch (e) {
+        statusDiv.innerHTML = '✕ Error: ' + e.message;
+    }
+}
+
+async function generateOutreach() {
+    const statusDiv = document.getElementById('scrape-status');
+    statusDiv.classList.remove('hidden');
+    statusDiv.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full inline-block mr-2"></div>Generating outreach drafts...';
+    try {
+        const resp = await fetch('/api/research/generate-outreach', {method: 'POST'});
+        const data = await resp.json();
+        statusDiv.innerHTML = '✓ Outreach drafts ready. <a href="javascript:location.reload()" class="text-primary-400 ml-2 underline">Refresh</a>';
+        setTimeout(() => location.reload(), 3000);
+    } catch (e) {
+        statusDiv.innerHTML = '✕ Error: ' + e.message;
+    }
+}
+</script>
+
+{% endblock %}

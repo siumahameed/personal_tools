@@ -1,0 +1,12 @@
+from app.core.config import settings
+
+
+def test_settings_defaults():
+    assert settings.llm_provider == "openai"
+    assert settings.max_search_results == 25
+    assert settings.scrape_delay == 0
+    assert settings.match_threshold == 50
+
+
+def test_settings_db_url():
+    assert settings.database_url == "sqlite+aiosqlite:///app/data/ggh.db"

@@ -1,0 +1,148 @@
+categories:
+  # ── Bangladesh faculty ─────────────────────────────────────────
+  bd_faculty:
+    # Machine Learning / AI
+    - 'Bangladesh machine learning professor researchgate'
+    - 'Bangladesh machine learning professor scholar'
+    - 'Bangladesh deep learning professor researchgate'
+    - 'Bangladesh AI researcher researchgate'
+    - 'Bangladesh artificial intelligence professor linkedin'
+    - 'Bangladesh neural networks professor scholar'
+    # Computer Science / Data Science
+    - 'Bangladesh computer science professor researchgate'
+    - 'Bangladesh computer science professor scholar'
+    - 'Bangladesh data science professor researchgate'
+    - 'Bangladesh data science professor linkedin'
+    # NLP / Computer Vision
+    - 'Bangladesh NLP researcher researchgate'
+    - 'Bangladesh natural language processing professor scholar'
+    - 'Bangladesh computer vision professor researchgate'
+    - 'Bangladesh image processing professor linkedin'
+    # Statistics / Related
+    - 'Bangladesh statistics professor researchgate'
+    - 'Bangladesh statistics professor scholar'
+    - 'Bangladesh data analysis professor researchgate'
+    - 'Bangladesh econometrics professor researchgate'
+    - 'Bangladesh biostatistics professor researchgate'
+    # University-specific
+    - 'BUET CSE professor researchgate'
+    - 'BUET machine learning researcher scholar'
+    - 'Dhaka University data science professor researchgate'
+    - 'Dhaka University AI professor linkedin'
+    - 'BRAC University computer science professor researchgate'
+
+  # ── Bangladesh students / RAs ──────────────────────────────────
+  bd_students:
+    # ML / DL / AI
+    - 'Bangladesh machine learning student researchgate'
+    - 'Bangladesh deep learning student researchgate'
+    - 'Bangladesh AI PhD student researchgate'
+    - 'Bangladesh machine learning research assistant researchgate'
+    - 'Bangladesh machine learning graduate student linkedin'
+    - 'Bangladesh deep learning researcher linkedin'
+    # NLP / CV
+    - 'Bangladesh NLP student researchgate'
+    - 'Bangladesh natural language processing graduate linkedin'
+    - 'Bangladesh computer vision student researchgate'
+    - 'Bangladesh image processing graduate linkedin'
+    # Data Science / Statistics
+    - 'Bangladesh data science student researchgate'
+    - 'Bangladesh data science graduate linkedin'
+    - 'Bangladesh MSc statistics student researchgate'
+    - 'Bangladesh PhD statistics student researchgate'
+    - 'Bangladesh research assistant statistics researchgate'
+    - 'Bangladesh PhD candidate machine learning researchgate'
+    - 'Bangladesh PhD student machine learning linkedin'
+    - 'Bangladesh PhD student AI linkedin'
+    # General research positions
+    - 'Bangladesh graduate student machine learning linkedin'
+    - 'Bangladesh graduate student data science linkedin'
+    - 'Bangladesh research assistant data science linkedin'
+    - 'Bangladesh junior researcher AI researchgate'
+    - 'Bangladesh junior researcher machine learning linkedin'
+    - 'Bangladesh data science intern linkedin'
+
+  # ── Global: ML / DL / AI researchers ─────────────────────────
+  global_ml_research:
+    # Deep Learning & Neural Networks
+    - 'deep learning researcher researchgate'
+    - 'deep learning PhD student researchgate'
+    - 'neural networks researcher researchgate'
+    - 'transformer model researcher researchgate'
+    - 'deep learning scientist linkedin'
+    # Machine Learning
+    - 'machine learning researcher researchgate'
+    - 'machine learning scientist researchgate'
+    - 'machine learning classification scikit-learn researchgate'
+    - 'machine learning PhD student linkedin'
+    - 'machine learning researcher scholar'
+    # AI / Artificial Intelligence
+    - 'artificial intelligence researcher researchgate'
+    - 'AI researcher researchgate'
+    - 'artificial intelligence PhD student linkedin'
+    # NLP
+    - 'NLP researcher researchgate'
+    - 'natural language processing researcher researchgate'
+    - 'NLP PhD student linkedin'
+    - 'computational linguistics researcher researchgate'
+    # Computer Vision
+    - 'computer vision researcher researchgate'
+    - 'computer vision PhD student researchgate'
+    - 'image processing researcher researchgate'
+    # Data Science
+    - 'data science researcher researchgate'
+    - 'data scientist researchgate'
+    - 'data science PhD student linkedin'
+    # Statistics / Applied Stats
+    - 'statistical modeling researchgate'
+    - 'applied statistics researchgate'
+    - 'biostatistics researchgate'
+    - 'data analysis researchgate'
+    - 'machine learning statistics scholar'
+
+  # ── Global: students & RAs ────────────────────────────────────
+  global_students:
+    - 'machine learning MSc student researchgate'
+    - 'machine learning PhD student researchgate'
+    - 'deep learning student researchgate'
+    - 'AI graduate student researchgate'
+    - 'research assistant machine learning researchgate'
+    - 'research assistant deep learning researchgate'
+    - 'graduate student natural language processing researchgate'
+    - 'computer vision MSc student researchgate'
+    - 'machine learning PhD student linkedin'
+    - 'deep learning PhD student linkedin'
+    - 'AI research assistant linkedin'
+    - 'data science MSc student linkedin'
+    - 'graduate student machine learning linkedin'
+    - 'junior researcher machine learning linkedin'
+    - 'junior researcher AI linkedin'
+    - 'PhD student machine learning scholar'
+    - 'research assistant statistics scholar'
+    - 'graduate student data science scholar'
+
+  # ── Reddit research communities ──────────────────────────────
+  reddit:
+    - 'site:reddit.com machine learning researcher looking for collaborators'
+    - 'site:reddit.com deep learning research collaboration'
+    - 'site:reddit.com AI researcher open to collaboration'
+    - 'site:reddit.com NLP research collaboration'
+    - 'site:reddit.com computer vision research team'
+    - 'site:reddit.com data science research collaboration'
+    - 'site:reddit.com ML researcher profile'
+    - 'site:reddit.com PhD machine learning'
+    - 'site:reddit.com PhD deep learning'
+    - 'site:reddit.com research assistant machine learning'
+
+  # ── Open research platforms / collaboration ──────────────────
+  global_open_projects:
+    - 'machine learning research collaboration students'
+    - 'deep learning research collaboration'
+    - 'AI research collaboration open source'
+    - 'NLP research collaboration'
+    - 'computer vision research collaboration'
+    - 'data science research collaboration'
+    - 'statistics machine learning research collaboration'
+    - 'natural language processing open research'
+    - 'machine learning open source research project'
+    - 'deep learning research project students'

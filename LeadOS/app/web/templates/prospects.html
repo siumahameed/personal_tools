@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="mb-6 flex items-start justify-between flex-wrap gap-4">
+    <div>
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-500/30 to-pink-500/30 border border-primary-500/40 flex items-center justify-center text-lg">🏢</div>
+            <p class="text-xs text-primary-400 uppercase tracking-widest font-semibold">Client Pipeline</p>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">Prospects</h1>
+        <p class="text-surface-400 text-sm mt-1.5">
+            {{ prospects|length }} compan{{ 'ies' if prospects|length != 1 else 'y' }} &mdash; potential clients you can reach out to
+        </p>
+    </div>
+    <div class="flex gap-2 items-center">
+        <div class="relative">
+            <svg class="w-4 h-4 text-surface-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="search" placeholder="Search companies..."
+                   class="glass border border-surface-700 focus:border-primary-500/50 focus:ring-1 focus:ring-primary-500/30 rounded-xl pl-9 pr-4 py-2 text-sm w-56 placeholder-surface-500 transition">
+        </div>
+        <a href="/api/export/csv" class="glass border border-surface-700 hover:border-primary-500/50 text-surface-300 hover:text-primary-300 text-sm rounded-xl px-3.5 py-2 font-medium transition flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            CSV
+        </a>
+    </div>
+</div>
+
+<div class="space-y-3">
+    {% for p in prospects %}
+    {% set has_contact = p.contact_name or p.email or (p.contacts and p.contacts|length > 0) %}
+    {% set score = p.relevance_score or 0 %}
+
+    <div class="glass rounded-2xl border border-surface-800/80 overflow-hidden hover:border-surface-700 transition group prospect-card">
+        <div class="px-5 py-3.5 border-b border-surface-800 flex items-start justify-between flex-wrap gap-3 bg-gradient-to-r from-surface-800/30 to-transparent">
+            <div class="flex items-center gap-3 min-w-0">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500/25 to-pink-500/25 border border-surface-700 flex items-center justify-center text-sm font-bold text-surface-200 shrink-0">
+                    {{ p.company_name[:2]|upper if p.company_name else '??' }}
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base font-semibold text-surface-100 truncate">{{ p.company_name }}</h3>
+                    {% if p.industry %}
+                    <p class="text-xs text-surface-500 truncate">{{ p.industry[:80] }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+                {% if has_contact %}
+                <span class="text-xs bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">Contact known</span>
+                {% else %}
+                <span class="text-xs bg-surface-800 text-surface-500 border border-surface-700 px-2 py-0.5 rounded-full">No contact</span>
+                {% endif %}
+                <span class="text-xs bg-surface-800 text-surface-400 border border-surface-700 px-2 py-0.5 rounded">{{ p.source|replace('_',' ')|title }}</span>
+                {% if p.relevance_score %}
+                <div class="flex items-center gap-1 bg-surface-900 px-2.5 py-1 rounded-lg border border-surface-700">
+                    <span class="w-1.5 h-1.5 rounded-full {{ 'bg-emerald-400' if score >= 70 else 'bg-amber-400' if score >= 40 else 'bg-surface-500' }}"></span>
+                    <span class="text-sm font-bold {{ 'text-emerald-400' if score >= 70 else 'text-amber-400' if score >= 40 else 'text-surface-400' }}">{{ score }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="p-5 grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="space-y-4">
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-2">People</div>
+                    {% set all_contacts = p.contacts or [] %}
+                    {% if not all_contacts and (p.contact_name or p.email) %}
+                        {% set all_contacts = [{"name": p.contact_name, "title": p.contact_title, "email": p.email, "linkedin": p.linkedin_url}] %}
+                    {% endif %}
+                    {% if all_contacts %}
+                    <div class="space-y-1.5">
+                        {% for contact in all_contacts[:5] %}
+                        {% set cname = contact.name or p.contact_name or '' %}
+                        {% set cemail = contact.email or p.email or '' %}
+                        {% set clinkedin = contact.linkedin or p.linkedin_url or '' %}
+                        <div class="flex items-center flex-wrap gap-x-3 gap-y-1 bg-surface-900/60 border border-surface-800 rounded-lg px-3 py-2 text-sm">
+                            {% if cname %}
+                            <span class="font-medium text-surface-200">{{ cname }}</span>
+                            {% endif %}
+                            {% if contact.title or p.contact_title %}
+                            <span class="text-surface-500 text-xs">{{ contact.title or p.contact_title }}</span>
+                            {% endif %}
+                            {% if cemail %}
+                            <a href="mailto:{{ cemail }}" class="text-xs text-sky-400 hover:text-sky-300 ml-auto transition">{{ cemail }}</a>
+                            {% endif %}
+                            {% if clinkedin %}
+                            <a href="{{ clinkedin }}" target="_blank" class="text-xs bg-blue-600/20 text-blue-300 hover:bg-blue-600/30 px-2 py-0.5 rounded transition">LinkedIn</a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% if all_contacts|length > 5 %}
+                        <p class="text-surface-600 text-xs pl-1">+{{ all_contacts|length - 5 }} more</p>
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <div class="bg-surface-900/60 border border-dashed border-surface-700 rounded-lg px-4 py-3 text-center text-surface-500 text-sm">
+                        No contacts yet
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-2">Links</div>
+                    <div class="flex flex-wrap gap-1.5">
+                        {% if p.company_url %}
+                        <a href="{{ p.company_url }}" target="_blank" class="text-xs glass border border-surface-700 text-surface-300 hover:text-primary-300 hover:border-primary-500/50 px-2.5 py-1 rounded-lg transition">Website ↗</a>
+                        {% endif %}
+                        {% if p.linkedin_url %}
+                        <a href="{{ p.linkedin_url }}" target="_blank" class="text-xs glass border border-surface-700 text-surface-300 hover:text-blue-300 hover:border-blue-500/50 px-2.5 py-1 rounded-lg transition">LinkedIn ↗</a>
+                        {% endif %}
+                        {% if p.social_links %}
+                            {% for platform, url in p.social_links.items() %}
+                            {% if url %}
+                            <a href="{{ url }}" target="_blank" class="text-xs glass border border-surface-700 text-surface-300 hover:text-surface-100 hover:border-surface-600 px-2.5 py-1 rounded-lg transition">{{ platform|title }} ↗</a>
+                            {% endif %}
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                {% if p.notes %}
+                <div>
+                    <div class="text-[10px] font-semibold text-surface-500 uppercase tracking-widest mb-2">Context</div>
+                    <p class="text-surface-300 text-sm leading-relaxed bg-surface-900/60 border border-surface-800 rounded-lg p-3">{{ p.notes[:300] }}{% if p.notes|length > 300 %}&hellip;{% endif %}</p>
+                </div>
+                {% endif %}
+
+                <div class="flex items-center gap-3 text-xs text-surface-500 pt-1">
+                    {% if p.relevance_reason %}
+                    <span class="text-surface-400">{{ p.relevance_reason[:100] }}</span>
+                    {% endif %}
+                    {% if p.created_at %}
+                    <span class="ml-auto text-surface-600">Found: {{ p.created_at.strftime('%b %d, %Y') if p.created_at else '' }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="glass rounded-2xl border-2 border-dashed border-surface-700 px-8 py-16 text-center">
+        <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary-500/20 to-pink-500/20 flex items-center justify-center text-4xl mx-auto mb-4">🏢</div>
+        <p class="text-xl font-semibold mb-2 gradient-text">No prospects yet</p>
+        <p class="text-sm text-surface-400 mb-6 max-w-md mx-auto leading-relaxed">Run the pipeline on the <a href="/" class="text-primary-400 hover:text-primary-300">Home</a> page to find companies and their decision-makers.</p>
+        <a href="/" class="bg-gradient-to-r from-primary-600 via-purple-600 to-pink-600 hover:from-primary-500 hover:via-purple-500 hover:to-pink-500 text-white text-sm rounded-xl px-5 py-2.5 font-semibold transition shadow-lg shadow-primary-500/20 inline-flex items-center gap-2">
+            Go to Dashboard
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+document.getElementById('search')?.addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('.prospect-card').forEach(card => {
+        card.style.display = card.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+});
+</script>
+{% endblock %}

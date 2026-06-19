@@ -1,0 +1,33 @@
+[project]
+name = "freelancing-os"
+version = "0.1.0"
+description = "Cold Email OS — find client opportunities, match skills, generate cold emails"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]",
+    "sqlalchemy>=2.0",
+    "aiosqlite",
+    "playwright",
+    "beautifulsoup4",
+    "httpx",
+    "openai",
+    "anthropic",
+    "ddgs>=9.0",
+    "jinja2",
+    "pydantic>=2.0",
+    "pydantic-settings",
+    "python-dotenv",
+    "click",
+    "pyyaml",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[project.scripts]
+ggh = "app.web.cli:cli"
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
