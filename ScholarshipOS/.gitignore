@@ -1,0 +1,23 @@
+# Scraped data
+data/*.json
+data/mastery.db
+data/mastery.db-wal
+data/mastery.db-shm
+!data/data_loader.py
+
+# Credentials & secrets
+credentials.json
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Frontend build
+frontend/node_modules/
+frontend/dist/
+
+# Temp files
+tmp_*
+*.lock
