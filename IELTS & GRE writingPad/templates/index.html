@@ -27,6 +27,21 @@
       <input type="text" id="searchInput" placeholder="Search articles..." spellcheck="false">
     </div>
     <div class="category-filters" id="categoryFilters"></div>
+    <div id="keywordFiltersContainer" class="keyword-filters-sidebar">
+      <div class="kw-sidebar-header">
+        <span class="kw-filter-label">Keywords</span>
+        <div class="kw-match-toggle" id="kwMatchToggleContainer" title="Toggle match logic: ANY (matches either) or ALL (matches both)">
+          <span class="match-mode-label">Match:</span>
+          <button id="kwMatchModeBtn" class="btn-match-mode">ANY</button>
+        </div>
+      </div>
+      <div class="kw-search-box">
+        <input type="text" id="kwSearchInput" placeholder="Filter tags..." spellcheck="false">
+        <button id="clearKwFiltersBtn" class="btn-clear-kw hidden" title="Clear keyword filters">&times;</button>
+      </div>
+      <div id="keywordFiltersList" class="kw-filters-list"></div>
+    </div>
+    <div id="activeFiltersIndicator" class="active-filters-bar hidden"></div>
     <nav id="articleList"></nav>
     <div class="sidebar-footer">
       <button id="collapseBtn" class="btn-footer-icon" title="Collapse Sidebar (Ctrl+\)">
@@ -83,12 +98,34 @@
           </div>
         </div>
         <div class="dash-card">
-          <div class="dash-card-header">Quick Tips</div>
-          <div class="dash-card-body tips-body">
-            <div class="tip"><strong>IELTS T1:</strong> 150 words, 20 min</div>
-            <div class="tip"><strong>IELTS T2:</strong> 250 words, 40 min</div>
-            <div class="tip"><strong>GRE Issue:</strong> 500+ words, 30 min</div>
-
+          <div class="dash-card-header">Top Keywords</div>
+          <div class="dash-card-body" id="dashKeywordsBreakdown">
+            <div class="dash-empty">No keywords tagged yet</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">Progress Trend</div>
+          <div class="dash-card-body" style="padding:6px;">
+            <canvas id="progressChart" width="280" height="130"></canvas>
+            <div class="dash-empty" id="progressEmpty">Write more essays to see progress</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">Vocabulary Trend</div>
+          <div class="dash-card-body" id="dashVocabTrend">
+            <div class="dash-empty">No articles yet</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">Common Weak Words</div>
+          <div class="dash-card-body" id="dashWeakWords">
+            <div class="dash-empty">No data yet</div>
+          </div>
+        </div>
+        <div class="dash-card">
+          <div class="dash-card-header">Top Used Words</div>
+          <div class="dash-card-body" id="dashTopWords">
+            <div class="dash-empty">No data yet</div>
           </div>
         </div>
       </div>
@@ -107,6 +144,14 @@
           </div>
         </div>
         <input type="text" id="subtitleInput" placeholder="Subtitle (optional)" spellcheck="false">
+        <div class="keywords-input-wrap">
+          <div class="keywords-tags" id="keywordsTags"></div>
+          <input type="text" id="keywordsInput" placeholder="Add custom keyword (press Enter)" spellcheck="false">
+        </div>
+        <div class="keyword-suggestions-row">
+          <span class="kw-suggestions-label">Quick Tags:</span>
+          <div class="kw-suggestions-list" id="keywordSuggestions"></div>
+        </div>
         <div class="editor-meta-line">
           <div class="category-selector">
             <label for="categorySelect" class="meta-label">Category:</label>
@@ -163,6 +208,16 @@
         <div class="vocab-body" id="vocabBody"></div>
       </div>
 
+      <!-- Grammar Check -->
+      <div id="grammarPanel" class="hidden">
+        <div class="vocab-header">
+          <span>Grammar Check</span>
+          <span class="grammar-summary" id="grammarSummary"></span>
+          <button id="grammarClose" class="vocab-close">&times;</button>
+        </div>
+        <div class="vocab-body" id="grammarBody"></div>
+      </div>
+
       <!-- Bottom Bar -->
       <div class="editor-bottombar">
         <div class="bottom-left">
@@ -177,6 +232,12 @@
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
             </svg>
             Vocab
+          </button>
+          <button id="grammarBtn" class="btn-tool" title="Check Grammar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+            </svg>
+            Grammar
           </button>
         </div>
         <div class="bottom-center">
@@ -217,6 +278,100 @@
       <button id="deleteCancelBtn" class="btn-modal btn-modal-secondary">Cancel</button>
       <button id="deleteConfirmBtn" class="btn-modal btn-modal-danger">Delete</button>
     </div>
+  </div>
+</div>
+
+<!-- ─── EXPORT PDF MODAL ─── -->
+<div id="exportPdfModal" class="modal-overlay hidden">
+  <div class="modal-box export-modal-box">
+    <div class="modal-header-row">
+      <h3 class="modal-title" style="text-align: left; margin: 0;">Export Selected to PDF</h3>
+      <button id="exportCloseBtn" class="modal-close-btn" title="Close modal">&times;</button>
+    </div>
+    
+    <div class="modal-search-row">
+      <input type="text" id="exportSearchInput" placeholder="Search essays..." spellcheck="false">
+    </div>
+    
+    <div class="modal-bulk-actions">
+      <button id="exportSelectAllBtn" class="btn-text-action">Select All</button>
+      <span class="bullet-divider">&bull;</span>
+      <button id="exportDeselectAllBtn" class="btn-text-action">Deselect All</button>
+    </div>
+
+    <div id="exportEssaysList" class="export-essays-list">
+      <!-- Dynamic list of essays with checkboxes will render here -->
+    </div>
+
+    <div class="export-summary" id="exportSummaryText">
+      Selected: 0 essays (0 words)
+    </div>
+
+    <div class="modal-actions export-modal-actions">
+      <button id="exportCancelBtn" class="btn-modal btn-modal-secondary">Cancel</button>
+      <button id="exportConfirmBtn" class="btn-primary" disabled>Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FULL-SCREEN READER ─── -->
+<div id="readerOverlay" class="reader-overlay hidden">
+  <div class="reader-bar">
+    <div class="reader-bar-left">
+      <button id="readerClose" class="reader-btn reader-btn-back" title="Close (Esc)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Back
+      </button>
+      <span class="reader-reads-badge" id="readerReadsBadge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+          <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>
+        </svg>
+        <span id="readerReadCount">0</span>
+      </span>
+    </div>
+    <div class="reader-bar-right">
+      <div class="reader-font-size">
+        <button id="readerFontDec" class="reader-btn reader-btn-icon" title="Smaller">A−</button>
+        <span class="reader-size-label" id="readerFontSizeLabel">18</span>
+        <button id="readerFontInc" class="reader-btn reader-btn-icon" title="Larger">A+</button>
+      </div>
+      <span class="reader-sep"></span>
+      <select id="readerFontSelect" class="reader-select" title="Font family">
+        <option value="sans">Sans</option>
+        <option value="serif">Serif</option>
+        <option value="mono">Mono</option>
+      </select>
+      <span class="reader-sep"></span>
+      <div class="reader-themes" id="readerThemes">
+        <button data-theme="light" class="reader-theme-dot active" title="Light" style="background:#f5f4f0;border-color:#d4d2ca"></button>
+        <button data-theme="dark" class="reader-theme-dot" title="Dark" style="background:#1a1b23;border-color:#3d424f"></button>
+        <button data-theme="sepia" class="reader-theme-dot" title="Sepia" style="background:#f7f0e3;border-color:#dcd3c6"></button>
+        <button data-theme="forest" class="reader-theme-dot" title="Forest" style="background:#edf5ee;border-color:#b8d4be"></button>
+        <button data-theme="ocean" class="reader-theme-dot" title="Ocean" style="background:#eef3f8;border-color:#b8ccda"></button>
+      </div>
+    </div>
+  </div>
+  <div class="reader-scroll">
+    <div class="reader-article" id="readerArticle">
+      <div class="reader-loading">Loading...</div>
+    </div>
+  </div>
+
+  <!-- ─── HIGHLIGHT POPUP ─── -->
+  <div id="readerPopup" class="reader-popup hidden">
+    <div class="reader-popup-colors">
+      <button data-color="yellow" class="rp-color rp-yellow" title="Yellow highlight"></button>
+      <button data-color="green" class="rp-color rp-green" title="Green highlight"></button>
+      <button data-color="pink" class="rp-color rp-pink" title="Pink highlight"></button>
+    </div>
+    <div class="reader-popup-sep"></div>
+    <button id="readerPopupRemove" class="rp-remove" title="Remove highlight">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
   </div>
 </div>
 
