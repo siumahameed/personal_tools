@@ -1,0 +1,56 @@
+categories:
+  # ── Major BD research institutes & agencies ────────────────────
+  bd_agriculture:
+    - 'Bangladesh Agricultural Research Institute BARI website'
+    - 'Bangladesh Rice Research Institute BRRI website'
+    - 'Bangladesh Institute of Nuclear Agriculture BINA'
+    - 'Bangladesh Sugarcane Research Institute'
+    - 'Bangladesh Jute Research Institute BJRI'
+    - 'Bangladesh Fisheries Research Institute BFRI'
+    - 'Bangladesh Livestock Research Institute BLRI'
+    - 'Soil Resource Development Institute SRDI Bangladesh'
+
+  bd_health_medical:
+    - 'icddr b research opportunities fellowship'
+    - 'icddrb internship research assistant'
+    - 'National Institute of Preventive and Social Medicine NIPSOM Bangladesh'
+    - 'Bangladesh Medical Research Council BMRC fellowship'
+    - 'National Institute of Cancer Research Hospital Bangladesh'
+    - 'ICDDRB call for proposals research'
+    - 'Child Health Research Foundation Bangladesh'
+    - 'International Centre for Diarrhoeal Disease Research Bangladesh jobs'
+
+  bd_economics_policy:
+    - 'Bangladesh Institute of Development Studies BIDS research'
+    - 'Bangladesh Bureau of Statistics BBS data research'
+    - 'Centre for Policy Dialogue CPD Bangladesh research'
+    - 'Bangladesh Institute of Governance and Studies BIGS'
+    - 'South Asian Network on Economic Modeling SANEM research'
+    - 'Power and Participation Research Centre PPRC Bangladesh'
+
+  bd_engineering_tech:
+    - 'Bangladesh Computer Council BCC research'
+    - 'Bangladesh Council of Scientific and Industrial Research BCSIR'
+    - 'Bangladesh Atomic Energy Commission BAEC research'
+    - 'Bangladesh Space Research and Remote Sensing Organization SPARRSO'
+    - 'Bangladesh University of Engineering and Technology BUET research centre'
+    - 'Institute of Information Technology IIT research Bangladesh'
+
+  bd_funding_opportunities:
+    - 'Bangladesh research fellowship statistics data science'
+    - 'UGC Bangladesh research grant fellowship'
+    - 'Bangabandhu Science and Technology Fellowship Bangladesh'
+    - 'National Science and Technology Fellowship Bangladesh NST fellowship'
+    - 'Ministry of Science and Technology Bangladesh research grant'
+    - 'Information and Communication Technology Division Bangladesh ICT fellowship'
+    - 'Bangladesh research internship machine learning'
+    - 'Dhaka University research centre fellowship opportunity'
+    - 'Bangladesh government research fellowship data analysis'
+
+  bd_innovation_incubation:
+    - 'Hice BD incubation research Bangladesh'
+    - 'Ideation Lab Bangladesh research'
+    - 'Bangladesh Innovation Forum research'
+    - 'Govt research lab Bangladesh data science'
+    - 'Bangladesh Research and Education Network BdREN'
+    - 'Bangladesh National Scientific and Technical Documentation Centre BANSDOC'

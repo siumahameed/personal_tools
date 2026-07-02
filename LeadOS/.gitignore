@@ -3,5 +3,6 @@ __pycache__/
 .env
 *.db
 outputs/
+logs/
 .pytest_cache/
 *.egg-info/

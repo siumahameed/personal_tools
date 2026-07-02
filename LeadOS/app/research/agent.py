@@ -675,13 +675,7 @@ class ResearchDiscoveryAgent(BaseAgent):
             if v:
                 keywords.append(v[:100])
 
-        # Country from affiliations
-        country = ""
-        for a in affs:
-            addr = (a.get("address") or {}) if False else {}
-            # address is nested under organization -> address
-            org_data = next((x for x in (data.get("activities-summary") or {}).get(a["group"], []) if x == a), None)
-        # Easier: derive country from institution text
+        # Country from institution text
         all_text = " ".join([institution, department] + keywords).lower()
         country = ResearchDiscoveryAgent._guess_country_from_text(all_text)
         if not country and institution:
@@ -1277,14 +1271,6 @@ class ResearchDiscoveryAgent(BaseAgent):
             why_good_fit=fit_info.get("why_good_fit", ""),
         )
         session.add(lead)
-        contact_summary = []
-        if lead.contact_email: contact_summary.append("email")
-        if lead.contact_phone: contact_summary.append("phone")
-        if lead.linkedin_url: contact_summary.append("linkedin")
-        if lead.github_url: contact_summary.append("github")
-        if lead.google_scholar_url: contact_summary.append("scholar")
-        if lead.orcid_url: contact_summary.append("orcid")
-        contact_str = ",".join(contact_summary) or "none"
 
     @staticmethod
     def _classify_source(url: str) -> str:

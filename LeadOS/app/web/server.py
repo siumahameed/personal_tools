@@ -1,6 +1,7 @@
 import asyncio
 import sys
-import time
+import logging
+from contextlib import asynccontextmanager
 from datetime import datetime
 from fastapi import FastAPI, Request, Depends
 from fastapi.responses import HTMLResponse, JSONResponse, StreamingResponse
@@ -10,27 +11,22 @@ from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from pathlib import Path
 
-from app.core.database import init_db, get_session
-from app.core.models import Prospect, OutreachDraft, ResearchLead, UserProfile
+from app.core.database import init_db, get_session, close_db
+from app.core.models import Prospect, OutreachDraft, ResearchLead, ResearchOrganization, UserProfile
 
-if sys.platform == "win32":
-    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-app = FastAPI(title="leadOS — Client Prospecting")
+logger = logging.getLogger(__name__)
 
 templates_dir = Path(__file__).parent / "templates"
 static_dir = Path(__file__).parent / "static"
 templates = Jinja2Templates(directory=str(templates_dir))
 
-if static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
-
 task_status: dict = {"current": None, "history": []}
 
 def _set_task(name: str, status: str, message: str = ""):
+    current = task_status.get("current")
     task_status["current"] = {
         "name": name, "status": status, "message": message,
-        "started_at": datetime.utcnow().isoformat() if status == "running" else task_status.get("current", {}).get("started_at"),
+        "started_at": datetime.utcnow().isoformat() if status == "running" else (current or {}).get("started_at"),
         "finished_at": datetime.utcnow().isoformat() if status in ("completed", "failed") else None,
     }
     if status in ("completed", "failed"):
@@ -38,12 +34,21 @@ def _set_task(name: str, status: str, message: str = ""):
         task_status["history"] = task_status["history"][:10]
 
 
-@app.on_event("startup")
-async def startup():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     init_db()
     from app.core.database import async_session
     async with async_session() as session:
         await _seed_user_profile(session)
+    yield
+    await close_db()
+
+app = FastAPI(title="leadOS — Client Prospecting", lifespan=lifespan)
+
+if static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -58,6 +63,10 @@ async def dashboard(request: Request, session: AsyncSession = Depends(get_sessio
         select(func.count(ResearchLead.id)).where(ResearchLead.region == "bangladesh")
     )).scalar() or 0
     global_research = total_research - bd_research
+    total_research_orgs = (await session.execute(select(func.count(ResearchOrganization.id)))).scalar() or 0
+    orgs_with_opportunities = (await session.execute(
+        select(func.count(ResearchOrganization.id)).where(ResearchOrganization.relevance_score >= 60)
+    )).scalar() or 0
     profile = (await session.execute(select(UserProfile))).scalar_one_or_none()
 
     recent_prospects = (await session.execute(
@@ -104,6 +113,8 @@ async def dashboard(request: Request, session: AsyncSession = Depends(get_sessio
             "bd_research": bd_research,
             "global_research": global_research,
             "manual_research": manual_research,
+            "total_research_orgs": total_research_orgs,
+            "orgs_with_opportunities": orgs_with_opportunities,
         },
         "source_stats": source_stats,
         "recent_prospects": recent_prospects,
@@ -200,9 +211,9 @@ async def api_run_search():
 
 async def _seed_user_profile(session):
     profile = (await session.execute(select(UserProfile))).scalar_one_or_none()
-    if not profile:
-        profile = UserProfile()
-        session.add(profile)
+    if profile:
+        return
+    profile = UserProfile()
     profile.name = "Sium Ahameed"
     profile.title = "Machine Learning Engineer & Data Analyst"
     profile.summary = "Statistics graduate with strong foundation in statistical modeling and data analysis. Skilled in building predictive models with Scikit-learn, data visualization, and FastAPI web applications. Based in Dhaka, Bangladesh."
@@ -211,6 +222,7 @@ async def _seed_user_profile(session):
     profile.location = "Dhaka, Bangladesh"
     profile.experience_years = 2
     profile.preferred_roles = ["Data Analyst", "ML Engineer (Scikit-learn)", "Data Visualization", "FastAPI Developer", "Business Intelligence", "Statistical Analysis"]
+    session.add(profile)
     await session.commit()
 
 
@@ -292,7 +304,6 @@ async def api_cleanup_fakes(session: AsyncSession = Depends(get_session)):
     from app.discovery.web_search import GENERIC_COMPANY_NAMES
     from sqlalchemy import delete
 
-    generic_pattern = [n.title() for n in GENERIC_COMPANY_NAMES] + [n.lower() for n in GENERIC_COMPANY_NAMES]
     deleted = 0
     for name in GENERIC_COMPANY_NAMES:
         result = await session.execute(
@@ -400,7 +411,7 @@ async def api_import_research_csv():
     """Import manually collected researchers from CSV on disk."""
     import csv
     from pathlib import Path
-    csv_path = Path(__file__).parent.parent.parent / "It's Sium - DS & RE.csv"
+    csv_path = Path(__file__).parent.parent.parent / "data" / "It's Sium - DS & RE.csv"
     if not csv_path.exists():
         return JSONResponse({"status": "error", "message": "CSV file not found at: " + str(csv_path)})
 
@@ -415,13 +426,13 @@ async def api_import_research_csv():
             skipped += 1
             continue
         email = (row.get("Email") or "").strip()
-        linkedin = (row.get("LinkdIn") or "").strip()
+        linkedin = (row.get("LinkdIn") or row.get("LinkedIn") or "").strip()
         phone = (row.get("Phone") or "").strip()
         institution = (row.get("University") or "").strip()
         extra = (row.get("Extra info") or "").strip()
 
         if linkedin and not linkedin.startswith("http"):
-            linkedin = "https://www." + linkedin
+            linkedin = "https://www.linkedin.com/in/" + linkedin if "/in/" not in linkedin else "https://" + linkedin
         all_emails = [email] if email else []
         bio = extra[:600] if extra else ""
 
@@ -464,14 +475,11 @@ async def api_import_research_csv():
 
 
 @app.post("/api/research/generate-outreach")
-async def api_generate_research_outreach(session: AsyncSession = Depends(get_session)):
+async def api_generate_research_outreach():
     """Generate outreach drafts for high-scoring research leads."""
     from app.research.agent import ResearchOutreachAgent
     async with ResearchOutreachAgent() as agent:
         await agent.run(min_score=30)
-    result = await session.execute(
-        select(ResearchLead).where(ResearchLead.outreach_draft != "").limit(1)
-    )
     return {"status": "ok", "message": "Outreach drafts generated"}
 
 
@@ -527,6 +535,59 @@ async def api_prospects_filter(
         "notes": p.notes[:200] if p.notes else "", "created_at": str(p.created_at or ""),
         "contacts": p.contacts or [],
     } for p in result.scalars().all()]
+
+
+@app.get("/research/orgs", response_class=HTMLResponse)
+async def research_orgs_page(request: Request, session: AsyncSession = Depends(get_session)):
+    result = await session.execute(
+        select(ResearchOrganization)
+        .order_by(ResearchOrganization.relevance_score.desc())
+    )
+    orgs = result.scalars().all()
+    return templates.TemplateResponse(request, "research_orgs.html", {
+        "orgs": orgs,
+    })
+
+
+@app.post("/api/run/research-orgs")
+async def api_run_research_orgs():
+    _set_task("Research Orgs", "running", "Discovering Bangladeshi research organizations...")
+    async def task():
+        try:
+            from app.research.organization_discovery import ResearchOrgDiscoveryAgent, ResearchOrgMatcherAgent
+            async with ResearchOrgDiscoveryAgent() as agent:
+                await agent.run()
+            async with ResearchOrgMatcherAgent() as agent:
+                await agent.run()
+            _set_task("Research Orgs", "completed", "Research organizations updated")
+        except Exception as e:
+            _set_task("Research Orgs", "failed", str(e))
+    asyncio.create_task(task())
+    return JSONResponse({"status": "started", "message": "Discovering research organizations..."})
+
+
+@app.get("/api/research/organizations")
+async def api_research_organizations(
+    min_score: int = 0,
+    session: AsyncSession = Depends(get_session),
+):
+    q = select(ResearchOrganization)
+    if min_score > 0:
+        q = q.where(ResearchOrganization.relevance_score >= min_score)
+    result = await session.execute(q.order_by(ResearchOrganization.relevance_score.desc()).limit(200))
+    return [{
+        "id": o.id, "name": o.name, "acronym": o.acronym or "",
+        "description": o.description, "website": o.website,
+        "country": o.country, "research_areas": o.research_areas or [],
+        "opportunity_types": o.opportunity_types or [],
+        "application_url": o.application_url or "",
+        "contact_email": o.contact_email, "contact_phone": o.contact_phone or "",
+        "social_links": o.social_links or {},
+        "source": o.source, "relevance_score": o.relevance_score,
+        "relevance_reason": o.relevance_reason, "why_good_fit": o.why_good_fit,
+        "outreach_draft": o.outreach_draft, "status": o.status,
+        "created_at": str(o.created_at or ""),
+    } for o in result.scalars().all()]
 
 
 @app.get("/api/export/csv")

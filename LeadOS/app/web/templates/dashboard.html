@@ -89,6 +89,15 @@
         <p class="text-3xl font-bold bg-gradient-to-r from-amber-400 to-yellow-400 bg-clip-text text-transparent">{{ stats.manual_research }}</p>
         <p class="text-xs text-surface-400 mt-1">Manual Imports</p>
     </a>
+
+    <a href="/research/orgs" class="stat-card glass rounded-2xl p-4 glow-amber border border-surface-800/80 block hover:border-orange-500/40 transition group">
+        <div class="flex items-center justify-between mb-2">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500/20 to-orange-500/20 flex items-center justify-center text-base">🏛️</div>
+            <svg class="w-3 h-3 text-surface-600 group-hover:text-orange-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </div>
+        <p class="text-3xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">{{ stats.total_research_orgs }}</p>
+        <p class="text-xs text-surface-400 mt-1">Research Agencies</p>
+    </a>
 </div>
 
 <!-- Two main columns: Clients pipeline + Research -->
@@ -153,9 +162,10 @@
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/><path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/></svg>
                     Find Research Collaborators
                 </button>
-                <div class="grid grid-cols-3 gap-1.5">
+                <div class="grid grid-cols-4 gap-1.5">
                     <a href="/research/bd" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition text-center">🇧🇩 BD ({{ stats.bd_research }})</a>
                     <a href="/research/global" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition text-center">🌍 Global ({{ stats.global_research }})</a>
+                    <a href="/research/orgs" class="bg-surface-800/60 hover:bg-surface-700 text-surface-300 rounded-lg py-2 text-xs font-medium transition text-center">🏛️ Orgs ({{ stats.total_research_orgs }})</a>
                     <button onclick="importCsv()" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 rounded-lg py-2 text-xs font-medium transition text-center">📋 CSV ({{ stats.manual_research }})</button>
                 </div>
             </div>
@@ -217,7 +227,7 @@
                     </div>
                     {% endif %}
                     <span class="text-surface-200 flex-1">{{ h.name }}</span>
-                    <span class="text-xs text-surface-600">{{ h.finished_at[:10] if h.finished_at else '' }}</span>
+                    <span class="text-xs text-surface-600">{{ h.finished_at[:10] if h.finished_at is string else '' }}</span>
                 </div>
                 {% endfor %}
             </div>
@@ -317,6 +327,7 @@ async function importCsv() {
     bar.classList.remove('hidden');
     try {
         const r = await fetch('/api/research/import-csv', { method: 'POST' });
+        if (!r.ok) throw new Error((await r.json()).message || 'Request failed');
         const d = await r.json();
         if (d.status === 'ok') {
             bar.className = 'mb-6 glass border border-emerald-700/50 rounded-xl p-4 flex items-center gap-3';
@@ -328,7 +339,7 @@ async function importCsv() {
         setTimeout(() => location.reload(), 3000);
     } catch (e) {
         bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
-        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + e.message + '</span>';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + ((e && e.message) || String(e)) + '</span>';
     }
 }
 
@@ -347,13 +358,14 @@ async function runAction(action) {
     bar.classList.remove('hidden');
     try {
         const r = await fetch('/api/run/' + action, { method: 'POST' });
+        if (!r.ok) throw new Error((await r.json()).message || 'Request failed');
         const d = await r.json();
         bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">' + d.message + '</span>';
         window.taskRunning = true;
         pollTaskStatus();
     } catch (e) {
         bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
-        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + e.message + '</span>';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">' + ((e && e.message) || String(e)) + '</span>';
     }
 }
 
@@ -363,6 +375,7 @@ async function pollTaskStatus() {
     pollInterval = setInterval(async () => {
         try {
             const r = await fetch('/api/task-status');
+            if (!r.ok) throw new Error('Status check failed');
             const data = await r.json();
             const bar = document.getElementById('status-bar');
             const current = data.current;
@@ -378,7 +391,14 @@ async function pollTaskStatus() {
             }
             bar.className = 'mb-6 glass border border-amber-700/50 rounded-xl p-4 flex items-center gap-3';
             bar.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full shrink-0"></div> <span class="text-amber-300 text-sm font-medium">' + (current.message || current.name) + '</span>';
-        } catch (e) { clearInterval(pollInterval); pollInterval = null; }
+        }         catch (e) {
+            clearInterval(pollInterval); pollInterval = null;
+            const bar = document.getElementById('status-bar');
+            if (bar) {
+                bar.className = 'mb-6 glass border border-red-700/50 rounded-xl p-4 flex items-center gap-3';
+                bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">Status check failed</span>';
+            }
+        }
     }, 3000);
 }
 if (window.taskRunning) { pollTaskStatus(); }

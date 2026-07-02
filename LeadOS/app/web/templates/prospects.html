@@ -50,7 +50,7 @@
                 <span class="text-xs bg-surface-800 text-surface-500 border border-surface-700 px-2 py-0.5 rounded-full">No contact</span>
                 {% endif %}
                 <span class="text-xs bg-surface-800 text-surface-400 border border-surface-700 px-2 py-0.5 rounded">{{ p.source|replace('_',' ')|title }}</span>
-                {% if p.relevance_score %}
+                {% if p.relevance_score is not none %}
                 <div class="flex items-center gap-1 bg-surface-900 px-2.5 py-1 rounded-lg border border-surface-700">
                     <span class="w-1.5 h-1.5 rounded-full {{ 'bg-emerald-400' if score >= 70 else 'bg-amber-400' if score >= 40 else 'bg-surface-500' }}"></span>
                     <span class="text-sm font-bold {{ 'text-emerald-400' if score >= 70 else 'text-amber-400' if score >= 40 else 'text-surface-400' }}">{{ score }}</span>

@@ -9,4 +9,5 @@ def test_settings_defaults():
 
 
 def test_settings_db_url():
-    assert settings.database_url == "sqlite+aiosqlite:///app/data/ggh.db"
+    url = settings.database_url.replace("\\", "/")
+    assert url.endswith("app/data/ggh.db")

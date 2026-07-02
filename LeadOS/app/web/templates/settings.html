@@ -208,13 +208,14 @@ document.getElementById('profile-form')?.addEventListener('submit', async functi
     const data = Object.fromEntries(form.entries());
     try {
         const r = await fetch('/api/profile/update', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+        if (!r.ok) throw new Error((await r.json()).message || 'Request failed');
         const d = await r.json();
         bar.className = 'mb-6 glass rounded-xl p-4 border border-emerald-700/50 flex items-center gap-3';
         bar.innerHTML = '<span class="text-emerald-400 shrink-0">✓</span> <span class="text-emerald-300 text-sm">' + d.message + '</span>';
         setTimeout(() => { bar.classList.add('hidden'); location.reload(); }, 1500);
     } catch (e) {
         bar.className = 'mb-6 glass rounded-xl p-4 border border-red-700/50 flex items-center gap-3';
-        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">Failed: ' + e.message + '</span>';
+        bar.innerHTML = '<span class="text-red-400 shrink-0">✕</span> <span class="text-red-300 text-sm">Failed: ' + ((e && e.message) || String(e)) + '</span>';
     }
 });
 </script>

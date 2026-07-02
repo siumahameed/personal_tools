@@ -244,11 +244,12 @@ async function runScrape(type) {
     statusDiv.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full inline-block mr-2"></div>Searching for researchers — this takes 1–3 minutes...';
     try {
         const resp = await fetch('/api/run/research?bd_only=true', {method: 'POST'});
+        if (!resp.ok) throw new Error((await resp.json()).message || 'Request failed');
         const data = await resp.json();
         statusDiv.innerHTML = '✓ ' + data.message + ' <a href="javascript:location.reload()" class="text-primary-400 ml-2 underline">Refresh in 60s</a>';
         setTimeout(() => location.reload(), 60000);
     } catch (e) {
-        statusDiv.innerHTML = '✕ Error: ' + e.message;
+        statusDiv.innerHTML = '✕ Error: ' + ((e && e.message) || String(e));
     }
 }
 
@@ -258,11 +259,12 @@ async function generateOutreach() {
     statusDiv.innerHTML = '<div class="animate-spin h-4 w-4 border-2 border-amber-400 border-t-transparent rounded-full inline-block mr-2"></div>Generating outreach drafts...';
     try {
         const resp = await fetch('/api/research/generate-outreach', {method: 'POST'});
+        if (!resp.ok) throw new Error((await resp.json()).message || 'Request failed');
         const data = await resp.json();
         statusDiv.innerHTML = '✓ Outreach drafts ready. <a href="javascript:location.reload()" class="text-primary-400 ml-2 underline">Refresh</a>';
         setTimeout(() => location.reload(), 3000);
     } catch (e) {
-        statusDiv.innerHTML = '✕ Error: ' + e.message;
+        statusDiv.innerHTML = '✕ Error: ' + ((e && e.message) || String(e));
     }
 }
 </script>

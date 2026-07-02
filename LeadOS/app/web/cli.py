@@ -83,6 +83,22 @@ def match():
 
 
 @cli.command()
+def research_orgs():
+    """Find Bangladeshi research agencies & institutes with opportunities for outsiders"""
+    init_db()
+    async def _run():
+        from app.research.organization_discovery import ResearchOrgDiscoveryAgent, ResearchOrgMatcherAgent
+        click.echo("  Searching for Bangladeshi research organizations...")
+        async with ResearchOrgDiscoveryAgent() as agent:
+            await agent.run()
+        click.echo("Scoring organizations...")
+        async with ResearchOrgMatcherAgent() as agent:
+            await agent.run()
+        click.echo("Research organization discovery complete! Visit /research/orgs on the dashboard.")
+    async_run(_run())
+
+
+@cli.command()
 @click.option("--region", "-r", type=click.Choice(["bd", "global", "all"]), default="all", help="Region to focus on")
 def research(region):
     """Find research collaborators (faculty, students, PhDs) for academic collaboration"""
@@ -252,7 +268,7 @@ def leads():
             )
             prospects = result.scalars().all()
         if not prospects:
-            click.echo("No high-scoring prospects yet. Run: python -m app run-all")
+            click.echo("No high-scoring prospects yet. Run: python -m app match")
             return
         for p in prospects:
             click.echo("=" * 70)
@@ -265,7 +281,7 @@ def leads():
             click.echo(f"  Reason:     {p.relevance_reason or 'N/A'}")
             notes = (p.notes or "")[:300]
             if notes:
-                clean = notes.replace("\ufeff", "").encode("ascii", "replace").decode()
+                clean = notes.replace("\ufeff", "").strip()
                 click.echo(f"  Context:    {clean}")
             click.echo(f"  Source:     {p.source}")
         click.echo("=" * 70)

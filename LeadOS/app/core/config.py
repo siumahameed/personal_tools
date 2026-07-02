@@ -1,9 +1,14 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
+_PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file="app/data/.env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(
+        env_file=str(_PROJECT_ROOT / "app" / "data" / ".env"),
+        env_file_encoding="utf-8",
+    )
 
     # LLM
     openai_api_key: str = ""
@@ -13,11 +18,11 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o"
 
     # Database
-    database_url: str = "sqlite+aiosqlite:///app/data/ggh.db"
+    database_url: str = f"sqlite+aiosqlite:///{_PROJECT_ROOT / 'app' / 'data' / 'ggh.db'}"
 
     # Paths
-    data_dir: Path = Path("outputs")
-    config_dir: Path = Path("app/discovery")
+    data_dir: Path = _PROJECT_ROOT / "outputs"
+    config_dir: Path = _PROJECT_ROOT / "app" / "discovery"
 
     # Search backends (cascading: serpapi -> google -> ddgs)
     serpapi_api_key: str = ""

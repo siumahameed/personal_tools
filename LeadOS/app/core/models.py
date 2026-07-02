@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, func
+from sqlalchemy import Column, Integer, String, Text, DateTime, JSON, Float, func
 from app.core.database import Base
 
 
@@ -15,7 +15,7 @@ class UserProfile(Base):
     location = Column(Text, default="Remote")
     preferred_roles = Column(JSON, default=list)
     created_at = Column(DateTime, server_default=func.now())
-    updated_at = Column(DateTime, onupdate=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
         return f"<UserProfile(name='{self.name}', title='{self.title}')>"
@@ -142,3 +142,31 @@ class ResearchLead(Base):
 
     def __repr__(self):
         return f"<ResearchLead(id={self.id}, name='{self.name[:30]}', institution='{self.institution[:30]}', score={self.relevance_score})>"
+
+
+class ResearchOrganization(Base):
+    __tablename__ = "research_organizations"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Text)
+    acronym = Column(Text, default="")
+    description = Column(Text, default="")
+    website = Column(Text, default="")
+    country = Column(Text, default="Bangladesh")
+    research_areas = Column(JSON, default=list)
+    opportunity_types = Column(JSON, default=list)
+    application_url = Column(Text, default="")
+    contact_email = Column(Text, default="")
+    contact_phone = Column(Text, default="")
+    social_links = Column(JSON, default=dict)
+    source = Column(Text, default="web_search")
+    source_query = Column(Text, default="")
+    relevance_score = Column(Integer, default=0)
+    relevance_reason = Column(Text, default="")
+    why_good_fit = Column(Text, default="")
+    outreach_draft = Column(Text, default="")
+    status = Column(Text, default="new")
+    created_at = Column(DateTime, server_default=func.now())
+
+    def __repr__(self):
+        return f"<ResearchOrganization(id={self.id}, name='{self.name[:40]}', score={self.relevance_score})>"

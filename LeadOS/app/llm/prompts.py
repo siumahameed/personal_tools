@@ -264,6 +264,58 @@ Return ONLY valid JSON:
 {{"score": 0-100, "reason": "Brief 1-line explanation", "why_good_fit": "2-sentence friendly explanation for the student"}}"""
 
 
+RESEARCH_ORG_EXTRACT = """You are a research opportunity discovery specialist. Find Bangladeshi research agencies, institutes, and organizations that offer research opportunities for external collaborators.
+
+Given a webpage about a research organization, research institute, or funding agency in Bangladesh, extract ALL information about the organization and the opportunities they offer.
+
+CRITICAL — REJECT if the page is NOT a genuine research organization page:
+- A generic university department page (not an independent research org)
+- A consulting company page
+- A job board or aggregator
+- A news article about research (not the organization itself)
+- A 404, login, or search results page
+
+Be EXHAUSTIVE. Scan the entire page including headers, footers, "opportunities", "careers", "fellowships", "open positions" sections.
+
+Extract:
+- name: Full name of the organization (e.g. "Bangladesh Agricultural Research Institute", "International Centre for Diarrhoeal Disease Research, Bangladesh")
+- acronym: Short form if available (e.g. "BARI", "icddr,b", "BIDS")
+- description: 2-3 sentence summary of what the organization does
+- website: Official website URL (homepage)
+- country: "Bangladesh" (or other if based elsewhere)
+- research_areas: List of research fields/domains the organization works in (e.g. ["Agriculture", "Climate Change", "Public Health", "Machine Learning", "Statistics", "Data Science"])
+- opportunity_types: List of opportunity types available (e.g. ["Research Fellowship", "Internship", "Research Assistant", "Collaboration", "Grant", "Training", "Workshop", "Call for Papers", "Open Call for Research Proposals"])
+- application_url: URL of the specific page where opportunities/fellowships/internships are listed
+- contact_email: Primary contact/general email of the organization
+- contact_phone: Phone number if shown
+- social_links: Object with social media URLs (e.g. {"facebook": "...", "linkedin": "...", "twitter": "..."})
+
+- is_organization: TRUE ONLY if this is a genuine research organization, institute, agency, or funding body. NOT a generic company, NOT a university department (unless it's a dedicated research center/institute).
+- has_opportunities_for_outsiders: TRUE if they accept external collaborators, have open calls, fellowships, internships, or RA positions that someone outside the organization can apply for.
+
+Return ONLY valid JSON:
+{
+  "is_organization": true/false,
+  "has_opportunities_for_outsiders": true/false,
+  "name": "",
+  "acronym": "",
+  "description": "",
+  "website": "",
+  "country": "Bangladesh",
+  "research_areas": [],
+  "opportunity_types": [],
+  "application_url": "",
+  "contact_email": "",
+  "contact_phone": "",
+  "social_links": {}
+}
+
+If the page is NOT a genuine research organization, return:
+{"is_organization": false, "has_opportunities_for_outsiders": false}
+
+Only return real information you can see on the page. Don't make up names, emails, or opportunities."""
+
+
 RESEARCH_OUTREACH = """You are a research collaboration outreach specialist. Write a warm, respectful, beginner-friendly email from an undergraduate student to a researcher.
 
 The STUDENT (sender):
