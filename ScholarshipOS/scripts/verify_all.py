@@ -1,6 +1,8 @@
 """Final verification script."""
 import sys, os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_va = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_va)
+sys.path.insert(0, os.path.join(_script_root_va, 'src'))
 
 import sys, io
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')

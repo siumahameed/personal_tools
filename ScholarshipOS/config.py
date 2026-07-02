@@ -59,6 +59,10 @@ SHEETS_CONFIG = {
     "credentials_path": os.environ.get("GOOGLE_CREDENTIALS_PATH", "credentials.json"),
 }
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(PROJECT_ROOT, "data")
+FRONTEND_DIST = os.path.join(PROJECT_ROOT, "web", "frontend", "dist")
+
 APP_CONFIG = {
     "app_name": "ScholarAI Agent",
     "version": "1.2.0",

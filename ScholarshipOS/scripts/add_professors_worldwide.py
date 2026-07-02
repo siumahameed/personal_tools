@@ -1,6 +1,8 @@
 """Add 100+ real professors worldwide with LinkedIn URLs and update existing ones."""
 import sys, os, json
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_apw = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_apw)
+sys.path.insert(0, os.path.join(_script_root_apw, 'src'))
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 

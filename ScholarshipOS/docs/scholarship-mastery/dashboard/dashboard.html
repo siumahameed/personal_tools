@@ -1,0 +1,619 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fully Funded Scholarships 2027 — Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#090c12;color:#e2e8f0;line-height:1.6}
+  .bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(ellipse 80% 55% at 50% -18%,rgba(59,130,246,.08),transparent),radial-gradient(ellipse 55% 35% at 80% 100%,rgba(139,92,246,.06),transparent)}
+  ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#090c12}::-webkit-scrollbar-thumb{background:#1e293b;border-radius:4px}
+  .wrap{max-width:1340px;margin:0 auto;padding:0 20px}
+  .hd{padding:36px 0 20px;border-bottom:1px solid #1a2332;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px}
+  .hd-l h1{font-size:clamp(1.3rem,3.5vw,2.4rem);font-weight:800;letter-spacing:-.03em;background:linear-gradient(135deg,#60a5fa,#a78bfa,#f472b6);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .hd-l .sub{color:#475569;font-size:.82rem;margin-top:2px}
+  .hd-r{text-align:right;flex-shrink:0}
+  .refresh-btn{display:inline-flex;align-items:center;gap:6px;background:#1a2332;color:#94a3b8;border:1px solid #263548;padding:8px 16px;border-radius:8px;font-size:.78rem;font-weight:500;cursor:pointer;transition:.25s;font-family:inherit}
+  .refresh-btn:hover{background:#1f2a3f;border-color:#3b82f6;color:#e2e8f0}
+  .refresh-btn:disabled{opacity:.5;cursor:not-allowed}
+  .refresh-btn .spinner{display:none;width:14px;height:14px;border:2px solid #475569;border-top-color:#60a5fa;border-radius:50%;animation:spin .8s linear infinite}
+  .refresh-btn.loading .spinner{display:inline-block}
+  .refresh-btn.loading .ico{display:none}
+  .ts{font-size:.65rem;color:#334155;margin-top:4px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .tabs{display:flex;gap:2px;margin:22px 0 0;border-bottom:1px solid #1a2332;overflow-x:auto}
+  .tabs button{background:none;border:none;color:#475569;padding:10px 14px;cursor:pointer;font-size:.75rem;font-weight:500;border-bottom:2px solid transparent;transition:.2s;white-space:nowrap;font-family:inherit}
+  .tabs button:hover{color:#94a3b8}
+  .tabs button.on{color:#60a5fa;border-bottom-color:#60a5fa}
+  .tab{display:none;padding:24px 0}
+  .tab.on{display:block}
+  .st{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+  .sd{color:#64748b;font-size:.85rem;margin-bottom:16px}
+  .g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}
+  .g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .cd{background:#10171f;border:1px solid #1a2332;border-radius:12px;padding:22px;transition:.25s;cursor:pointer}
+  .cd:hover{border-color:#3b82f6;transform:translateY(-2px);box-shadow:0 8px 30px rgba(59,130,246,.08)}
+  .cd .bdg{display:inline-block;font-size:.65rem;font-weight:600;padding:2px 9px;border-radius:12px;margin-bottom:8px;letter-spacing:.02em}
+  .bdg-p{background:rgba(139,92,246,.15);color:#a78bfa}.bdg-b{background:rgba(59,130,246,.15);color:#60a5fa}
+  .bdg-g{background:rgba(34,197,94,.15);color:#4ade80}.bdg-a{background:rgba(251,191,36,.15);color:#fbbf24}
+  .bdg-r{background:rgba(244,63,94,.15);color:#fb7185}.bdg-sky{background:rgba(14,165,233,.15);color:#38bdf8}
+  .bdg-em{background:rgba(236,72,153,.15);color:#f472b6}
+  .cd h3{font-size:1.05rem;font-weight:600}.cd .sub{color:#64748b;font-size:.78rem;margin-bottom:8px}
+  .cd p{color:#94a3b8;font-size:.84rem}
+  .cd .sr{display:flex;gap:14px;margin:10px 0;flex-wrap:wrap}
+  .cd .sr .s{text-align:center}
+  .cd .sr .s .n{font-size:1.05rem;font-weight:700;color:#e2e8f0}
+  .cd .sr .s .l{font-size:.62rem;color:#475569;text-transform:uppercase;letter-spacing:.04em}
+  .cd ul{list-style:none;padding:0}
+  .cd ul li{padding:3px 0;color:#94a3b8;font-size:.82rem;padding-left:14px;position:relative}
+  .cd ul li::before{content:'';position:absolute;left:0;top:10px;width:4px;height:4px;border-radius:50%;background:#3b82f6}
+  .mm{height:5px;background:#1a2332;border-radius:3px;margin:8px 0;overflow:hidden}
+  .mm .fl{height:100%;border-radius:3px;transition:width .7s}
+  .btn{display:inline-flex;align-items:center;gap:5px;background:#1a2332;color:#e2e8f0;border:1px solid #263548;padding:7px 16px;border-radius:7px;font-size:.8rem;font-weight:500;cursor:pointer;transition:.2s;text-decoration:none;font-family:inherit}
+  .btn:hover{background:#1f2a3f;border-color:#3b82f6}
+  .btn-p{background:#2563eb;border-color:#2563eb;color:#fff}
+  .btn-p:hover{background:#1d4ed8}
+  .chip{display:inline-block;background:#1a2332;color:#94a3b8;font-size:.72rem;padding:2px 9px;border-radius:12px;margin:1px;border:1px solid #263548}
+  .info-box{background:#10171f;border:1px solid #1a2332;border-radius:12px;padding:20px;margin-bottom:20px}
+  .info-box h4{font-size:.9rem;font-weight:600;margin-bottom:8px;color:#e2e8f0}
+  .info-box p,.info-box li{color:#94a3b8;font-size:.84rem}
+  .info-box ul{padding-left:18px;color:#94a3b8;font-size:.84rem}
+  .info-box ul li{margin-bottom:3px}
+  .tl{position:relative;padding-left:26px}
+  .tl::before{content:'';position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:#1a2332}
+  .tli{position:relative;margin-bottom:18px}
+  .tli::before{content:'';position:absolute;left:-22px;top:5px;width:10px;height:10px;border-radius:50%;background:#1a2332;border:2px solid #2563eb}
+  .tli .d{font-size:.72rem;color:#60a5fa;font-weight:600}
+  .tli .t{font-weight:600;font-size:.9rem}
+  .tli .dc{color:#94a3b8;font-size:.8rem}
+  .cat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .cat button{background:#1a2332;border:1px solid #263548;color:#64748b;padding:5px 14px;border-radius:20px;cursor:pointer;font-size:.75rem;font-weight:500;transition:.2s;font-family:inherit}
+  .cat button:hover{color:#94a3b8;border-color:#3b82f6}
+  .cat button.on{background:#1d4ed8;color:#fff;border-color:#2563eb}
+  .sec{margin-top:24px;padding-top:20px;border-top:1px solid #1a2332}
+  .ft{text-align:center;padding:32px 0;color:#334155;font-size:.78rem;border-top:1px solid #1a2332;margin-top:18px}
+  .modal-overlay{display:none;position:fixed;inset:0;z-index:1000;background:rgba(9,12,18,.85);backdrop-filter:blur(8px);overflow-y:auto;padding:20px}
+  .modal-overlay.on{display:block}
+  .modal{max-width:900px;margin:30px auto;background:#10171f;border:1px solid #1a2332;border-radius:16px;padding:32px;position:relative}
+  .modal-close{position:absolute;top:16px;right:16px;background:#1a2332;border:1px solid #263548;color:#64748b;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;transition:.2s;font-family:inherit}
+  .modal-close:hover{background:#263548;color:#e2e8f0}
+  .modal .st{font-size:1.3rem}
+  .modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px}
+  .modal-field{margin-bottom:12px}
+  .modal-field .lbl{font-size:.7rem;color:#475569;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px}
+  .modal-field .val{font-size:.88rem;color:#e2e8f0;line-height:1.5}
+  .modal-field .val ul{padding-left:16px;margin-top:4px}
+  .modal-field .val ul li{color:#94a3b8;font-size:.84rem;margin-bottom:2px}
+  .modal-section{margin-top:20px;padding-top:16px;border-top:1px solid #1a2332}
+  .modal-section h4{font-size:.95rem;font-weight:600;margin-bottom:8px;color:#e2e8f0}
+  @media(max-width:768px){.modal-grid{grid-template-columns:1fr}.modal{padding:20px;margin:10px auto}}
+  .click-hint{color:#475569;font-size:.72rem;margin-top:4px;font-style:italic}
+  .res-p{padding:4px 0;color:#cbd5e1;font-size:.88rem;line-height:1.7}
+  .res-p h1{font-size:1.4rem;font-weight:700;margin:18px 0 8px;color:#f1f5f9}
+  .res-p h2{font-size:1.15rem;font-weight:700;margin:16px 0 6px;color:#e2e8f0;border-bottom:1px solid #1a2332;padding-bottom:4px}
+  .res-p h3{font-size:1rem;font-weight:600;margin:14px 0 4px;color:#e2e8f0}
+  .res-p h4{font-size:.9rem;font-weight:600;margin:12px 0 4px;color:#94a3b8}
+  .res-p table{border-collapse:collapse;width:100%;margin:8px 0;font-size:.82rem}
+  .res-p table th{background:#1a2332;color:#94a3b8;padding:6px 10px;text-align:left;font-weight:600;border:1px solid #263548}
+  .res-p table td{padding:6px 10px;border:1px solid #1a2332;color:#94a3b8}
+  .res-p table tr:hover td{background:#0f1724}
+  .res-p li{color:#94a3b8;padding:2px 0;margin-left:18px}
+  .res-p code{background:#1a2332;color:#f472b6;padding:1px 5px;border-radius:3px;font-size:.82rem}
+  .res-p strong{color:#e2e8f0}
+  .res-p a{color:#60a5fa;text-decoration:underline}
+  .res-p input[type=checkbox]{margin-right:6px;accent-color:#3b82f6}
+  .res-p p{margin:6px 0;color:#94a3b8;font-size:.88rem}
+  .res-p b,.res-p strong{color:#e2e8f0}
+  .res-p i,.res-p em{color:#94a3b8}
+  .res-p blockquote{border-left:3px solid #3b82f6;margin:8px 0;padding:6px 14px;background:#0f1724;border-radius:0 6px 6px 0;color:#94a3b8;font-style:italic}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+<div class="hd">
+  <div class="hd-l">
+    <h1>Fully Funded Scholarships 2027 · Dashboard</h1>
+    <div class="sub">Erasmus Mundus · MBZUAI · DAAD · Fulbright · Chevening · Commonwealth</div>
+  </div>
+  <div class="hd-r">
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+      <span class="spinner"></span>
+      <span class="ico">&#x21bb;</span>
+      Refresh Data
+    </button>
+    <div class="ts" id="tsDisplay">Last updated: ...</div>
+  </div>
+</div>
+<div class="tabs" id="tabs">
+  <button class="on" data-t="all">All Scholarships</button>
+  <button data-t="erasmus">Erasmus Mundus</button>
+  <button data-t="mbzuai">MBZUAI</button>
+  <button data-t="daad">DAAD</button>
+  <button data-t="fulbright">Fulbright</button>
+  <button data-t="chevening">Chevening</button>
+   <button data-t="commonwealth">Commonwealth</button>
+   <button data-t="resources">Resources</button>
+</div>
+
+<div class="tab on" id="tab-all">
+  <div class="st">All Fully Funded Scholarships</div>
+  <div class="sd" id="allSd"></div>
+  <div class="click-hint">Click any card to see full details</div>
+  <div id="allList" class="g2"></div>
+  <div class="sec">
+    <div class="st">General Documents Required</div>
+    <div class="info-box"><ul>
+      <li><strong>Transcripts & Degree</strong> — Certified copies. English translation if needed.</li>
+      <li><strong>CV / Resume</strong> — Europass format for Erasmus. 1-2 pages.</li>
+      <li><strong>Motivation Letter / SOP</strong> — 1-2 pages: background, goals, why this programme.</li>
+      <li><strong>Reference Letters</strong> — 2-3 from professors or employers. Signed, letterhead, dated.</li>
+      <li><strong>English Proficiency</strong> — IELTS 6.5+, TOEFL 90+, or PTE.</li>
+      <li><strong>Passport Copy</strong> — Valid 2+ years.</li>
+      <li><strong>Portfolio / Video</strong> — Required by some programmes.</li>
+    </ul></div>
+  </div>
+  <div class="sec">
+    <div class="st">General Timeline</div>
+    <div class="tl" id="allTimeline"></div>
+  </div>
+  <div class="sec">
+    <div class="st">General Strategy</div>
+    <div class="g3">
+      <div class="info-box" style="border-color:#fb7185"><h4>URGENT: Fulbright ~11 Jul 2026</h4><p><strong>14 days away!</strong> Start Personal Statement + Study Objective essays NOW. 3 recommenders, CV, transcripts. Portal: apply.iie.org/ffsp2027.</p></div>
+      <div class="info-box"><h4>Deadline Stacking</h4><p>Fulbright (Jul 2026) &rarr; MBZUAI (rolling) &rarr; Chevening (Nov) &rarr; Commonwealth (Oct-Dec) &rarr; Erasmus (Dec-Feb) &rarr; DAAD (Aug-Sep 2027).</p></div>
+      <div class="info-box"><h4>Documents First</h4><p>Prepare transcripts, CV, IELTS, references by <strong>Aug 2026</strong>. All programmes overlap on documents.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="tab" id="tab-erasmus">
+  <div class="st">Erasmus Mundus Joint Masters</div>
+  <div class="sd" id="erasmusSd"></div>
+  <div class="click-hint">Click any card to see full details</div>
+  <div class="cat" id="erasmusCat">
+    <button class="on" data-c="all">All Programmes</button>
+    <button data-c="emai">EMAI</button>
+    <button data-c="deai">DEAI</button>
+    <button data-c="ediss">EDISS</button>
+    <button data-c="intermaths">InterMaths</button>
+    <button data-c="aiss">AISS</button>
+    <button data-c="mathsdisc">MATHS-DISC</button>
+    <button data-c="cosse">COSSE</button>
+  </div>
+  <div id="erasmusList" class="g2"></div>
+  <div class="sec">
+    <div class="st">Documents Required</div>
+    <div class="info-box"><ul>
+      <li>Online application via each portal (DreamApply, Studyinfo.fi, etc.)</li>
+      <li>Bachelor's degree + transcripts — certified + translated</li>
+      <li>Europass CV — 2-3 pages max</li>
+      <li>Motivation letter — tailored, 1-2 pages</li>
+      <li>2 reference letters — academic + professional</li>
+      <li>English proficiency — IELTS 6.5+ / TOEFL 90+</li>
+      <li>Passport copy</li>
+      <li>Optional: Video (EDISS, AISS), portfolio (AISS)</li>
+    </ul></div>
+  </div>
+  <div class="sec">
+    <div class="st">Timeline</div>
+    <div class="tl" id="erasmusTimeline"></div>
+  </div>
+  <div class="sec">
+    <div class="st">Strategy</div>
+    <div class="g3">
+      <div class="info-box"><h4>Choose 3 Wisely</h4><p>Reach + match + safety. Acceptance rates 5-15%.</p></div>
+      <div class="info-box"><h4>Tailor Every Letter</h4><p>Mention specific tracks, host universities, professors.</p></div>
+      <div class="info-box"><h4>Submit Early</h4><p>48+ hours before deadline. Systems get overloaded.</p></div>
+    </div>
+  </div>
+</div>
+
+<div class="tab" id="tab-mbzuai"><div class="st">MBZUAI — Mohamed Bin Zayed University of AI</div><div class="sd" id="mbzuaiSd"></div><div class="click-hint">Click card to see full details</div><div id="mbzuaiList" class="g2"></div>
+  <div class="sec"><div class="st">Documents Required</div><div class="info-box"><ul>
+    <li>Online application via MBZUAI portal</li><li>Bachelor's degree + transcripts</li><li>CV highlighting technical skills, projects</li>
+    <li>Statement of Purpose (500-1000 words)</li><li>2 reference letters</li><li>IELTS 6.5+ / TOEFL 90+</li>
+    <li>60-min online exam: Calculus, Linear Algebra, Probability, Trigonometry, Python, Data Structures, Algorithms</li><li>Technical interview (if shortlisted)</li></ul></div></div>
+  <div class="sec"><div class="st">Timeline</div><div class="tl" id="mbzuaiTimeline"></div></div>
+  <div class="sec"><div class="st">Strategy</div><div class="g3">
+    <div class="info-box"><h4>Apply Immediately</h4><p>Rolling = earlier decision. Reapply if rejected.</p></div>
+    <div class="info-box"><h4>Prepare for Exam</h4><p>Linear Algebra, Probability, Calculus, Python, basic ML.</p></div>
+    <div class="info-box"><h4>Best Backup</h4><p>&euro;3,900/mo highest stipend. Use as safety while waiting for Erasmus.</p></div>
+  </div></div>
+</div>
+
+<div class="tab" id="tab-daad"><div class="st">DAAD — German Government Scholarship</div><div class="sd" id="daadSd"></div><div class="click-hint">Click card to see full details</div><div id="daadList" class="g2"></div>
+  <div class="sec"><div class="st">Documents Required</div><div class="info-box"><ul>
+    <li>DAAD application form online</li><li>Bachelor's degree + transcripts + translation</li><li>Europass CV</li>
+    <li>Motivation letter (study plans, why Germany)</li><li>Reference letters</li><li>IELTS/TOEFL</li>
+    <li>Study proposal for EPOS; SOP for Study Scholarship</li><li>Admission letter from German university (some cases)</li></ul></div></div>
+  <div class="sec"><div class="st">Timeline</div><div class="tl" id="daadTimeline"></div></div>
+  <div class="sec"><div class="st">Strategy</div><div class="g3">
+    <div class="info-box"><h4>Programme First</h4><p>Find programme on DAAD database, get admission, then apply for scholarship.</p></div>
+    <div class="info-box"><h4>EPOS vs Study</h4><p>EPOS = experienced (2+ yrs). Study Scholarship = recent graduates.</p></div>
+    <div class="info-box"><h4>German Helps</h4><p>A1-A2 not required but strengthens application.</p></div>
+  </div></div>
+</div>
+
+<div class="tab" id="tab-fulbright"><div class="st">Fulbright Foreign Student Program</div><div class="sd" id="fulbrightSd"></div><div class="click-hint">Click card to see full details</div><div id="fulbrightList" class="g2"></div>
+  <div class="sec"><div class="st">Documents Required</div><div class="info-box"><ul>
+    <li>Online application via US Embassy portal</li><li>Bachelor's degree + transcripts</li><li>Detailed CV</li>
+    <li>Personal Statement (~1500 words, 2 pages)</li><li>Study/Research Objective</li><li>3 reference letters</li><li>TOEFL/IELTS (embassy may cover cost after shortlisting)
+    <li>GRE (recommended if available)</li><li>Interview at US Embassy Dhaka</li></ul></div></div>
+  <div class="sec"><div class="st">Timeline</div><div class="tl" id="fulbrightTimeline"></div></div>
+  <div class="sec"><div class="st">Strategy</div><div class="g3">
+    <div class="info-box"><h4>2+ Years Experience</h4><p>Fulbright prefers experienced candidates.</p></div>
+    <div class="info-box"><h4>Leadership & Impact</h4><p>Highlight volunteer work, PM experience, mentoring.</p></div>
+    <div class="info-box"><h4>Return Pledge</h4><p>Must return to Bangladesh for 2 years.</p></div>
+  </div></div>
+</div>
+
+<div class="tab" id="tab-chevening"><div class="st">Chevening Scholarships</div><div class="sd" id="cheveningSd"></div><div class="click-hint">Click card to see full details</div><div id="cheveningList" class="g2"></div>
+  <div class="sec"><div class="st">Documents Required</div><div class="info-box"><ul>
+    <li>Online application at chevening.org/apply</li><li>Bachelor's degree + transcripts</li><li>CV (2 pages, leadership focus)</li>
+    <li>4 essays: Leadership & Influence, Networking, Studying in UK, Career Plan (500 words each)</li>
+    <li>2 reference letters</li><li>IELTS 6.5+ (6.0 each band)</li>
+    <li>Unconditional UK university offer (before interview)</li><li>Interview at British Embassy</li></ul></div></div>
+  <div class="sec"><div class="st">Timeline</div><div class="tl" id="cheveningTimeline"></div></div>
+  <div class="sec"><div class="st">Strategy</div><div class="g3">
+    <div class="info-box"><h4>2,800 Hours</h4><p>~1.5 yrs full-time. ML Engineer + PM roles likely meet this.</p></div>
+    <div class="info-box"><h4>Leadership Focus</h4><p>Every essay must show leadership.</p></div>
+    <div class="info-box"><h4>3 UK Universities</h4><p>Apply early for unconditional offers.</p></div>
+  </div></div>
+</div>
+
+<div class="tab" id="tab-commonwealth"><div class="st">Commonwealth Master's Scholarships</div><div class="sd" id="commonwealthSd"></div><div class="click-hint">Click card to see full details</div><div id="commonwealthList" class="g2"></div>
+  <div class="sec"><div class="st">Documents Required</div><div class="info-box"><ul>
+    <li>CSC Electronic Application System (EAS)</li><li>Passport copy or national ID</li><li>Degree certificate + transcripts</li>
+    <li>2 reference letters (uploaded by deadline)</li><li>Proof of citizenship/permanent residency</li>
+    <li>University admission letter (if available)</li></ul></div></div>
+  <div class="sec"><div class="st">Timeline</div><div class="tl" id="commonwealthTimeline"></div></div>
+  <div class="sec"><div class="st">Strategy</div><div class="g3">
+    <div class="info-box"><h4>Apply via UGC Bangladesh</h4><p>Must apply through University Grants Commission, not directly to CSC.</p></div>
+    <div class="info-box"><h4>Development Impact</h4><p>Essays must show how you'll contribute to Bangladesh's development.</p></div>
+    <div class="info-box"><h4>2:1 Equivalent</h4><p>Need upper 2nd class honours. Check CGPA conversion.</p></div>
+  </div></div>
+</div>
+
+<div class="tab" id="tab-resources">
+  <div class="st">Application Resources & Guides</div>
+  <div class="sd">All planning documents, checklists, and templates — click any card to view.</div>
+  <div class="g2">
+    <div class="cd" onclick="openResource('timeline','Master Timeline')">
+      <span class="bdg bdg-b">Timeline</span>
+      <h3>Master Timeline</h3>
+      <div class="sub">Month-by-month plan · Jun 2026 – Sep 2027</div>
+      <p>Complete application timeline covering research, document prep, IELTS, recommenders, submissions, interviews, visa, and departure. Includes budget estimates (~100,000–140,000 BDT).</p>
+    </div>
+    <div class="cd" onclick="openResource('guide','Step-by-Step Application Guide')">
+      <span class="bdg bdg-g">Guide</span>
+      <h3>Step-by-Step Application Guide</h3>
+      <div class="sub">Full process from start to submission</div>
+      <p>Detailed walkthrough of each application step. Covers all portals (DreamApply, Studyinfo.fi, UPF, ULB), document requirements, and submission strategy.</p>
+    </div>
+    <div class="cd" onclick="openResource('checklist','Document Preparation Checklist')">
+      <span class="bdg bdg-a">Checklist</span>
+      <h3>Document Preparation Checklist</h3>
+      <div class="sub">Transcripts, certifications, translations</div>
+      <p>Complete checklist with priority matrix, Dhaka College transcript request template, recommender strategy, program-specific document lists, scanning specs, naming convention, and cloud folder structure.</p>
+    </div>
+    <div class="cd" onclick="openResource('template','Motivation Letter Template')">
+      <span class="bdg bdg-p">Template</span>
+      <h3>Motivation Letter Template</h3>
+      <div class="sub">General structure + programme-specific examples</div>
+      <p>Full template with sections (Opening, Academic Background, Professional Experience, Why This Programme, Future Goals, Closing). Includes tailoring examples for each Erasmus programme and word count guide.</p>
+    </div>
+    <div class="cd" onclick="openResource('emai-letter','EMAI Motivation Letter Draft')">
+      <span class="bdg bdg-p">Draft</span>
+      <h3>EMAI Motivation Letter Draft</h3>
+      <div class="sub">Full ~850-word tailored letter for EMAI</div>
+      <p>Complete drafted motivation letter for the Erasmus Mundus AI (EMAI) programme. Includes section breakdowns, a 1-minute video script guide, and key tailoring points explaining each element.</p>
+    </div>
+    <div class="cd" onclick="openResource('programs','Program Guides (8 Files)')">
+      <span class="bdg bdg-sky">Programs</span>
+      <h3>Program Guides (8 Files)</h3>
+      <div class="sub">Detailed information on all scholarships</div>
+      <p>In-depth program documents for EMAI, DEAI, EDISS, InterMaths, AISS, MATHS-DISC, COSSE, and other scholarships (MBZUAI, DAAD, Fulbright, Chevening, Commonwealth).</p>
+    </div>
+  </div>
+</div>
+<div class="ft">Fully Funded Scholarships 2027 · Dashboard | Click any card for full details</div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script src="resources-data.js"></script>
+<script>
+var SCHOLARSHIP_DATA = {
+  lastUpdated: "27 Jun 2026 (8/11 sites verified)",
+  timelines: {
+    all: [
+      {d:'Immediate',t:'FULBRIGHT DEADLINE 11 Jul!',c:'URGENT: 2 essays (Personal + Study Objective), 3 recommenders, CV. Portal: apply.iie.org/ffsp2027.'},
+      {d:'Jul 2026',t:'IELTS / English Test',c:'Book IELTS Academic (6.5+). Registration ~25,000 BDT. Slots fill fast in Bangladesh.'},
+      {d:'Aug 2026',t:'Document Collection',c:'Certified transcripts from Dhaka College, degree certificate, English translations, Europass CV.'},
+      {d:'Sep 2026',t:'Recommenders + Drafting',c:'Contact 2-3 recommenders. Start motivation letters. MBZUAI: prepare for online exam.'},
+      {d:'Oct-Nov 2026',t:'Chevening + Commonwealth + Erasmus',c:'Chevening 4 essays (Leadership, Networking, UK Study, Career Plan). Commonwealth via UGC. Erasmus portals open.'},
+      {d:'Dec 2026',t:'EMAI + MBZUAI Priority + EDISS',c:'EMAI ~20 Dec (1-min video). MBZUAI priority ~15 Nov, final ~15 Dec. EDISS ~8 Jan.'},
+      {d:'Jan-Feb 2027',t:'DEAI + COSSE + AISS + InterMaths',c:'DEAI mid-Jan. COSSE ~15 Jan. AISS ~2 Feb. InterMaths ~25 Feb (3 BD slots!).'},
+      {d:'Mar-Jun 2027',t:'Interviews & Results',c:'Chevening interviews (Dhaka). Erasmus results Apr-May. Commonwealth results Mar-Apr.'},
+      {d:'Jul-Aug 2027',t:'Visa + DAAD',c:'Student visa (4-8 wks). DAAD application (Aug-Sep). Accommodation, flights.'},
+      {d:'Sep 2027',t:'Departure!',c:'Orientation, scholarship first payment, classes begin in EU/UK/USA.'}
+    ],
+    erasmus: [
+      {d:'Jun-Aug 2026',t:'Research',c:'Study 7+ programmes. Choose max 3 (recommended: EMAI, InterMaths, DEAI).'},
+      {d:'Sep-Oct 2026',t:'Document Prep',c:'CV, certified transcripts, IELTS, references. Prepare 1-min video for EMAI.'},
+      {d:'Oct-Nov 2026',t:'Portals Open',c:'Register on DreamApply, UPF, ULB, Studyinfo.fi portals.'},
+      {d:'~20 Dec 2026',t:'EMAI Deadline',c:'Apply via UPF portal. 1-min video required. 2 reference letters. ~19 EMS scholarships.'},
+      {d:'~8 Jan 2027',t:'EDISS Deadline',c:'Studyinfo.fi (must complete in one sitting). EDISS CV template. Video instead of letter.'},
+      {d:'~15 Jan 2027',t:'COSSE Deadline',c:'universityadmissions.se. 1500 char motivation. Summary sheet on KTH site.'},
+      {d:'~Mid-Jan 2027',t:'DEAI Deadline',c:'ULB portal. Excel file of relevant courses is crucial for non-CS applicants.'},
+      {d:'~25 Feb 2027',t:'InterMaths Deadline',c:'3 scholarships reserved for Bangladesh! Reference letters can arrive late.'},
+      {d:'Feb-May 2027',t:'Interviews + Results',c:'AISS interview (15 min). EMAI possible interview. Main list offers Apr-May.'},
+      {d:'Jun-Sep 2027',t:'Visa & Travel',c:'Spanish/Belgian/Italian visa. Accommodation. Classes begin Sep.'}
+    ],
+    mbzuai: [
+      {d:'NOW (Rolling)',t:'Apply ASAP',c:'Rolling admissions. Priority deadline ~15 Nov, Final ~15 Dec. Earlier = better.'},
+      {d:'After Submission',t:'Online Exam (60 min)',c:'Math (Calculus, Linear Algebra, Probability, Trig), Python, Data Structures, Algorithms. AI-proctored.'},
+      {d:'Within 10 Days',t:'Exam Invitation',c:'Receive screening exam link. Complete within timeframe.'},
+      {d:'1-4 Weeks After Exam',t:'Technical Interview',c:'ML concepts, math, research interests, background discussion.'},
+      {d:'2-8 Weeks',t:'Decision',c:'Full scholarship: AED 15,500/mo (~EUR 3,900) + housing + tuition + insurance + airfare.'},
+      {d:'Before Semester',t:'Visa & Travel',c:'Degree attestation from UAE Ministry of Education required.'}
+    ],
+    daad: [
+      {d:'Jun-Aug 2026',t:'Research German Programmes',c:'Search DAAD database. Find tuition-free programmes in DS/ML/AI.'},
+      {d:'Aug 2026-Sep 2027',t:'Apply for Admission',c:'Apply directly to German universities. Admission letter needed for DAAD.'},
+      {d:'Aug-Sep 2027',t:'DAAD Application',c:'Submit scholarship application via DAAD portal. EUR 934/mo + insurance + travel.'},
+      {d:'Oct-Dec 2027',t:'Results',c:'Visa process. Travel to Germany for Winter 2027 or Summer 2028 intake.'}
+    ],
+    fulbright: [
+      {d:'NOW (URGENT)',t:'Prepare Application',c:'Deadline 11 Jul 2026! Personal Statement (~1500 words) + Study/Research Objective + 3 ref letters.'},
+      {d:'~11 Jul 2026',t:'Deadline (URGENT)',c:'Submit via apply.iie.org/ffsp2027. Do NOT register for TOEFL yet — embassy may provide vouchers.'},
+      {d:'Aug-Oct 2026',t:'Interview',c:'At US Embassy Dhaka. Panel asks about: field fit, 2-year return plan, leadership, cultural exchange.'},
+      {d:'Nov 2026-May 2027',t:'Placement',c:'US universities via Fulbright. J-1 visa = mandatory 2-year Bangladesh return after studies.'},
+      {d:'Aug-Sep 2027',t:'Depart',c:'Pre-academic orientation. Start Master at US university. ~15-25 slots for Bangladesh.'}
+    ],
+    chevening: [
+      {d:'Aug 2026',t:'Choose 3 UK Universities',c:'Apply for admission to UK unis (Imperial, UCL, Edinburgh, etc.). Get offers before Chevening interview.'},
+      {d:'Sep-Oct 2026',t:'Write 4 Essays',c:'Leadership & Influence, Networking, Studying in UK, Career Plan (500 words each). STAR method for Leadership.'},
+      {d:'~Early Nov 2026',t:'Deadline (noon GMT)',c:'= 18:00 Bangladesh time. 2,800 hrs post-grad work exp required. BSc must be done by ~Nov 2024.'},
+      {d:'Feb-Mar 2027',t:'Interview',c:'At British High Commission Dhaka. ~22-23 Bangladeshis selected annually.'},
+      {d:'Jun-Aug 2027',t:'Results + Visa',c:'Need unconditional UK offer by ~Jul 2027. Travel to UK for Sep start.'}
+    ],
+    commonwealth: [
+      {d:'May-Aug 2026',t:'CSC Publishes 2027/28 Call',c:'Check CSC website. Identify eligible UK programmes. Apply for admission.'},
+      {d:'Aug-Sep 2026',t:'Apply to UK Universities',c:'Get admission offers from 1+ UK universities. Development impact focus required.'},
+      {d:'Oct 2026',t:'Submit via UGC Bangladesh',c:'CSC Electronic Application System (EAS) through University Grants Commission. 2:1 honours equivalent needed.'},
+      {d:'Dec 2026',t:'Shared Scholarship Deadline',c:'Alternative route: apply directly to CSC for Commonwealth Shared Scholarships. Must have UK uni partnership.'},
+      {d:'Mar-Apr 2027',t:'Results',c:'CSC notifies winners. Can apply alongside Chevening (both UK, independent).'},
+      {d:'Sep 2027',t:'Depart',c:'Arrive in UK. Full tuition + stipend + airfare + research support grant.'}
+    ]
+  },
+  programs: [
+     {id:'emai',n:'EMAI',f:'Erasmus Mundus \u2014 AI',cat:'Erasmus Mundus',bg:'bdg-p',fo:'AI, ML, Deep Learning, NLP, Computer Vision, Robotics',lo:'Spain > Italy > Netherlands > Slovenia',dl:'~20 Dec 2026 (EMS scholarship round)',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'~19 EMS + 18 fee-waiver (79 students, 37 nationalities)',fq:'Sep 2027',ap:'UPF online portal',de:'Joint Master integrating Machine Learning with symbolic AI across 4 top European universities. 95% graduation rate. UCL London AI Summer School included. 37 nationalities across 79 students.',ur:'https://www.upf.edu/web/emai',mc:'#4ade80',mp:96,el:['BSc in CS, Engineering, Physics, Math, Statistics (180+ ECTS)','TOEFL iBT 90+ (22+ subscores) / IELTS 6.5+ (all 6.5+)','Statistics qualifies (12+ ECTS math/stats required)','Non-CS: 10-60 ECTS in relevant fields'],doc:['Completed online application via UPF portal','Degree + transcripts (certified + English translation)','Europass CV','Motivation letter (tailored to EMAI)','1-min video link (YouTube/Vimeo, max 30MB, auto-rejection if over)','2 reference letters (submitted confidentially via portal)','English proficiency certificate','Passport copy'],sp:['Intelligent Decision Making \u2014 Sapienza Rome','Cybersecurity \u2014 Radboud Nijmegen','Data Science \u2014 University of Ljubljana','Robotics & Intelligent Systems'],uni:['UPF Barcelona (coordinator)','Sapienza University Rome','Radboud University Nijmegen','University of Ljubljana','UCL London (assoc. partner, AI Summer School)'],cur:'Y1S1: Foundations at UPF Barcelona. Y1S2: Specialisation at partner. Summer: UCL AI Summer School + internship. Y2: Master thesis at host university.',proc:'Round 1 (Nov-Dec): EMS scholarship applications. Round 2 (Dec-Mar): Fee-waiver only. Round 3-4 (Mar-Jul): Self-funded. Results within 2-3 months of deadline.',tips:['Apply Round 1 for scholarship consideration. Video must be EXACTLY 1 minute \u2014 automated rejection if longer. Mention specific specialisation track in motivation letter. Submit 48h early \u2014 portal gets heavy traffic near deadline.'],why:['Statistics satisfies math requirements','ML Engineer maps directly to AI/ML curriculum','Data Science track in Slovenia fits stats background','UCL AI Summer School is a unique opportunity']},
+     {id:'deai',n:'DEAI',f:'Erasmus Mundus \u2014 Data Eng & AI',cat:'Erasmus Mundus',bg:'bdg-b',fo:'Data Engineering, Big Data, AI, ML, Statistical Learning, Business Data Science',lo:'Belgium > Spain > Austria/Italy/France',dl:'~Mid-Jan 2027',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'~20/year (first cohort 2026-2031)',fq:'Sep 2027',ap:'ULB online portal (deai.ulb.ac.be/emundus)',de:'World-class Data Engineering and AI programme. Successor to acclaimed BDMA programme. Strong research and industry focus. Statistics + programming background qualifies even without CS degree.',ur:'https://deai.ulb.be/',mc:'#60a5fa',mp:93,el:['BSc in CS preferred (180 ECTS)','Other degrees considered with CS/BI coursework','English B2','CRITICAL: Detailed Excel file mapping all relevant courses'],doc:['Online application form','Academic qualifications','CV, transcripts, degrees','Motivation letter','Excel file of relevant coursework with ECTS (CRITICAL!)','English certificate'],sp:['Knowledge-Driven Data Management & Intelligence \u2014 TU Wien','Business, Economics & Financial Data Science \u2014 Uni Padua','Data & Intelligence for Heterogeneous Systems \u2014 Lyon'],uni:['ULB Brussels (coordinator)','UPC Barcelona','TU Wien','Uni Padova','UC Lyon 1','TU Eindhoven (assoc.)'],cur:'Y1S1: Fundamentals at ULB. Y1S2: Deep fundamentals at UPC. Summer: Summer of Code. Y2: Specialisation + thesis.',proc:'Submit all materials including detailed Excel course file. Early submissions checked for completeness with feedback. Results announced spring.',tips:['Even though CS major preferred, your Statistics background + ML projects can compensate. The Excel file of relevant courses is CRUCIAL \u2014 list every CS/Math/Stats course with ECTS credits. Business Financial Data Science track at Padua fits Statistics perfectly. Apply early for feedback on amendments.'],why:['Statistics + programming qualifies for non-CS route','Business/Financial Data Science track fits stats background','Summer of Code mirrors production ML experience','Strong industry connections']},
+     {id:'im',n:'InterMaths',f:'Erasmus Mundus \u2014 Interdisciplinary Maths',cat:'Erasmus Mundus',bg:'bdg-g',fo:'Math Modelling, Stochastics, Neural Networks, CFD, Imaging',lo:'Italy > Austria/Germany/Spain/France',dl:'~25 Feb 2027 (1pm CET)',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'20 total (3 RESERVED for Bangladesh!)',fq:'Sep 2027',ap:'InterMaths portal (no application fee)',de:'Mathematical modelling with interdisciplinary applications. Network of 20+ European universities. 3 scholarships RESERVED for Bangladesh (Region 5a) \u2014 your best Erasmus chance. Reference letters can arrive after the deadline.',ur:'https://www.intermaths.eu/',mc:'#4ade80',mp:91,el:['BSc in Maths, Stats, Engineering, Physics, Economics (180+ ECTS)','Strong mathematical background','English B2','Statistics background is IDEAL for this programme'],doc:['Online application via InterMaths portal','Transcripts and degree certificate','CV','Motivation letter','2 reference letters (CAN arrive after deadline!)','English certificate (B2+)','Passport copy'],sp:['Stochastics for Biological/Artificial Neural Networks \u2014 Univ. Cote d\'Azur Nice','CFD and Computational Mechanics \u2014 TU Wien','Imaging and Inverse Problems \u2014 TUHH Hamburg','Decision Making \u2014 UAB Barcelona','Healthcare/Industrial \u2014 L\'Aquila'],uni:['Univ. L\'Aquila Italy (coordinator)','TU Hamburg (TUHH) Germany','TU Wien Austria','UAB Barcelona Spain','Univ. Cote d\'Azur Nice France','20+ associated partners across Europe'],cur:'Y1: Foundations at L\'Aquila + one partner. Y2: Specialisation track + Master thesis.',proc:'Single deadline 25 Feb for scholarship. Absolute ranking list. Geographical balance rule: max 2 same nationality per cohort. No application fee.',tips:['BEST ERASMUS CHANCE \u2014 3 scholarships reserved for Bangladesh (Region 5a)! Reference letters can arrive after the deadline \u2014 use this to your advantage. Statistics is the ideal background for this maths-heavy programme. Stochastics for Neural Networks track bridges stats + AI. 2465 applicants for 20 scholarships (~0.8% rate) but Bangladesh quota improves odds.'],why:['Statistics is a PERFECT academic match','3 scholarships RESERVED for Bangladeshi students','Stochastics for Neural Networks bridges stats + AI','Probability and stochastic modelling built into curriculum']},
+     {id:'ediss',n:'EDISS',f:'Erasmus Mundus \u2014 Data-intensive Software',cat:'Erasmus Mundus',bg:'bdg-a',fo:'ML Engineering, Data Science, Software Engineering, DevOps',lo:'Finland > Sweden/Italy/Spain',dl:'~8 Jan 2027 (3pm Helsinki)',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'15-20/year',fq:'Sep 2027',ap:'Studyinfo.fi portal',de:'Bridge data science and software engineering. Production-ready ML systems. 40+ industry partners (Nokia, Ericsson). Video replaces motivation letter.',ur:'https://www.master-ediss.eu/',mc:'#fbbf24',mp:87,el:['BSc in CS, Software Eng or equivalent (180 ECTS)','Programming, algorithms, data structures, comp architecture','Maths courses required','TOEFL iBT 93+ / IELTS 6.5+ (no subscore below 6)','Degree completed by 31 Jul for conditional admission'],doc:['Studyinfo.fi application (MUST complete in one sitting, no save)','EDISS CV template (mandatory, from website)','Motivation video (instead of letter)','Degree + transcripts (certified + English translation)','English certificate (IELTS 6.5+)','Passport copy','Official statement if degree not yet completed'],sp:['Data Science \u2014 L\'Aquila Italy','Intelligent Systems \u2014 Balearic Islands Spain','Software Engineering \u2014 Malardalen Sweden'],uni:['Abo Akademi Finland (coordinator)','Univ. L\'Aquila Italy','Univ. Balearic Islands Spain','Malardalen University Sweden','40+ industry partners: Nokia, Ericsson'],cur:'Y1S1: Foundations at Abo Akademi. Y1S2: Specialisation at host. Y2: Advanced courses + thesis/internship.',proc:'Studyinfo.fi portal \u2014 one sitting only (no save-draft). Submit before 8 Jan 3pm Helsinki time. Results in spring.',tips:['Motivation video replaces letter \u2014 you can stand out through personality. Your FastAPI/Streamlit deployment experience is exactly what EDISS values. Use EDISS CV template from their website. Country-specific requirements for Bangladesh \u2014 check website.'],why:['FastAPI/Streamlit production experience is perfect match','Video answer lets you stand out beyond grades','40+ industry partners = strong internships','ML pipeline deployment aligns with curriculum']},
+     {id:'aiss',n:'AISS',f:'Erasmus Mundus \u2014 AI for Sustainable Societies',cat:'Erasmus Mundus',bg:'bdg-r',fo:'AI, Data Science, Sustainability, Participatory Design',lo:'Estonia > Portugal > Finland',dl:'~2 Feb 2027',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'10/year (40 total over 4 cohorts)',fq:'Sep 2027',ap:'DreamApply portal',de:'Apply AI to sustainability. Interdisciplinary. 3 degrees: MA, MSc, MSSc. Small cohort. Only 10 scholarships/year \u2014 personal attention.',ur:'https://aissprogram.eu/',mc:'#fb7185',mp:82,el:['BSc in relevant field (CS, Stats, Engineering, Social Sciences)','English proficiency','Motivation for sustainability','Portfolio of relevant work'],doc:['DreamApply application','Degree + transcripts','CV','Motivation letter + video','Portfolio (projects, research, work samples)','English certificate','Self-funding plan (required even for scholarship applicants)'],sp:['AI & Data Science for Sustainability','Sustainable Digital Societies','Active Citizenship & Design'],uni:['Tallinn University (coordinator)','Lusofona University Portugal','Tampere University Finland','NGO partners: Citizen OS, Anthropocene Center'],cur:'Y1: Core AI + sustainability across Tallinn and Tampere. Y2: Specialisation + thesis at Lusofona/partner.',proc:'DreamApply portal. Submit early (they give pre-deadline feedback). Video + portfolio required. 15-min interview for shortlisted candidates.',tips:['Small scholarship pool (10) but smaller applicant pool too. Your AgriTech crop recommendation is a perfect portfolio piece. Apply early \u2014 they give pre-deadline feedback.'],why:['AgriTech fits sustainability theme perfectly','Volunteer work strengthens profile','Portfolio lets you showcase projects','Smaller applicant pool increases relative chances']},
+     {id:'md',n:'MATHS-DISC',f:'Erasmus Mundus \u2014 Mathematical Modelling & DS',cat:'Erasmus Mundus',bg:'bdg-sky',fo:'Math Modelling, Scientific ML, HPC, Computational Finance',lo:'Italy/Germany/Portugal/France/Ukraine',dl:'~2 Mar 2027 (R1) / ~30 Jun 2027 (R2)',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'15-20/year',fq:'Sep 2027',ap:'MathsDisc.eu portal',de:'Mathematical modelling and data science. 8 specialisation pathways. Score 90/130+ for admission (70 academic + 20 interview).',ur:'https://www.mathsdisc.eu/',mc:'#38bdf8',mp:80,el:['BSc in Math, Stats, Physics, CS (180+ ECTS)','Prereqs: Calculus 18, Lin Alg 6, Num Anal 6, Prog 6, Stats 6 ECTS','CGPA > 75% required','IELTS 6.5+ / TOEFL iBT 80+'],doc:['Online application','Passport copy','Degree + transcripts','Europass CV','Motivation letter','English certificate','Scholarship type choice'],sp:['Scientific Machine Learning','HPC & Quantum','Computational Finance','Health & Biomedicine','Agrifood & Environment','Computational Intelligence','Logistics & Optimisation','Mathematical Physics'],uni:['Univ. Verona (coordinator)','Univ. Wuppertal','Univ. Lisbon','Univ. Grenoble Alpes','Kyiv Polytechnic'],cur:'Y1S1: Foundations at assigned partner. Y1S2: Methods at Verona/Wuppertal. Y2: Specialisation + thesis.',proc:'Round 1 (Dec-Feb): Main EMJM scholarship round. Round 2 (May-Jun): Residual scholarships. Score 70/100 academic + 20/30 interview.',tips:['2 rounds = flexibility. Stats meets 6 ECTS Stats prerequisite. CGPA must be >75% \u2014 check conversion. Interview needs min 20/30. Scientific ML pathway bridges maths + AI.'],why:['Meets 6 ECTS Statistics prerequisite','Scientific ML bridges maths + AI','2 application rounds = 2 chances','8 specialisation pathways = flexibility']},
+     {id:'cosse',n:'COSSE',f:'Erasmus Mundus \u2014 Computer Simulations',cat:'Erasmus Mundus',bg:'bdg-em',fo:'Computational Science, HPC, Numerical Analysis, ML for Science, CFD',lo:'Germany (TU Berlin) > Sweden (KTH) / Netherlands (TU Delft)',dl:'~15 Jan 2027',du:'2 years (120 ECTS)',st:'\u20ac1,400/mo',sc:'~15/year (238 avg applicants)',fq:'Sep 2027',ap:'universityadmissions.se',de:'Double-degree in Computational Science \u2014 the 3rd pillar of science. Established 2010. 66% graduates pursue PhDs. Less AI/ML focused, more computational science and HPC.',ur:'https://www.kth.se/en/studies/master/computer-simulations-for-science-and-engineering',mc:'#f472b6',mp:72,el:['BSc in Math/Engineering/Natural Sciences (180 ECTS)','45 ECTS in Math + Programming including PDEs, Numerical Methods, Mathematical Statistics, Programming','IELTS 6.5+ / TOEFL 90+','Not primarily AI/ML focused \u2014 more computational science'],doc:['Application via universityadmissions.se','Degree certificate + transcripts','Passport copy','Motivation letter (1500 characters MAX)','Summary sheet (separate upload on KTH website)','English certificate'],sp:['Computational Fluid Dynamics (CFD)','Data Assimilation & Inverse Problems','High-Performance Computing','Machine Learning for Science'],uni:['KTH Stockholm (coordinator)','TU Berlin','TU Delft'],cur:'Y1: TU Berlin (scientific computing, numerical methods). Y2: KTH or TU Delft (specialisation + thesis). Double degree from both universities.',proc:'Apply via universityadmissions.se by 15 Jan. Submit summary sheet via KTH link separately. Results announced 1 Apr. Motivation letter limited to 1500 characters.',tips:['Less AI/ML focused \u2014 more about computational science and HPC. Strong for PhD pathway. Summary sheet is a separate requirement on KTH website \u2014 don\'t forget it. 1500 char limit means concise, high-impact writing. 66% of graduates go to PhD programmes worldwide.'],why:['Maths/Stats background qualifies','ML for Science pathway aligns with AI interests','66% PhD placement for research career','Double degree from 2 top European technical universities']},
+     {id:'mbzuai',n:'MBZUAI',f:'MBZUAI \u2014 AI University',cat:'Fellowship',bg:'bdg-g',fo:'ML, Computer Vision, NLP, Robotics, Generative AI, Stats & Data Science',lo:'Abu Dhabi, UAE',dl:'Rolling (Priority ~15 Nov, Final ~15 Dec)',du:'2 years (MSc)',st:'AED 15,500/mo (~\u20ac3,900)',sc:'All admitted MSc get full scholarship',fq:'Fall 2027 (apply Sep-Dec 2026)',ap:'apply.mbzuai.ac.ae',de:'World\'s first dedicated AI university. All admitted MSc get 100% tuition + AED 15,500/mo (~EUR 3,900) + on-campus housing + health insurance + annual airfare. No work experience required.',ur:'https://mbzuai.ac.ae/',mc:'#4ade80',mp:95,el:['BSc in STEM (CS, EE, Math, Physics, Statistics qualifies)','CGPA 3.0/4.0 minimum','TOEFL iBT 90+ / IELTS 6.5+ (physical test center, NOT home edition)','No mandatory work experience','Senior students can apply with transcripts'],doc:['Online application via apply.mbzuai.ac.ae','CV (academic background, work, publications, coding skills)','Official transcript + degree certificate','2 reference letters (1 academic + 1 professional)','Statement of Purpose (500-1000 words, PDF)','IELTS 6.5+ / TOEFL 90+ (Bangladesh not on waiver list)','Passport copy','White background photo','GRE (optional but recommended)'],sp:['MSc in Machine Learning','MSc in Computer Vision','MSc in Natural Language Processing','MSc in Robotics','MSc in Statistics & Data Science'],uni:['Mohamed Bin Zayed University of AI, Abu Dhabi'],cur:'Coursework + research thesis. Strong publication culture. Modern labs and GPU compute resources. 653 students from 59 nationalities.',proc:'Apply online -> Screening exam invitation within 10 days -> 60-min AI-proctored exam -> Technical interview (if shortlisted) -> Decision in 2-8 weeks.',tips:['APPLY NOW \u2014 rolling means earlier = better exam slots. Priority deadline ~15 Nov, final ~15 Dec. Exam covers: Calculus (diff/integration), Linear Algebra (matrices, eigenvalues, determinants), Probability, Trigonometry, Python, Data Structures, Algorithms. If rejected, reapply next cycle. 653 students from 59 nationalities.'],why:['Direct ML focus matches your career','CGPA 3.25 clears 3.0 minimum','Highest stipend ~EUR 3,900/mo (AED 15,500)','No work experience required','Rolling = quick decision (2-8 weeks)','MSc Statistics & Data Science also available']},
+     {id:'daad',n:'DAAD',f:'DAAD \u2014 German Government',cat:'Government',bg:'bdg-b',fo:'Any accredited programme \u2014 DS, ML, AI, Stats',lo:'Germany (any public university)',dl:'~Aug-Sep 2027 (varies by programme)',du:'1-2 years',st:'\u20ac934/mo',sc:'Varies by country (Bangladesh eligible)',fq:'Oct 2027 or Apr 2028',ap:'DAAD portal',de:'German government scholarship for developing countries. Funding at tuition-free German public universities. Includes EUR 934/mo monthly stipend + health insurance + travel allowance. Bangladesh qualifies as developing country. Good backup option due to later deadline.',ur:'https://www.daad.de/en/',mc:'#60a5fa',mp:85,el:['BSc degree (recent graduates)','Bangladesh qualifies as developing country','English proficiency B1+','German language beneficial (B1+ recommended)','Must be admitted to German university programme'],doc:['Online DAAD application form','Degree + transcripts','Europass CV (tabular, max 3 pages)','Motivation letter (study plans, why Germany)','2 reference forms','English/German proficiency certificate','Letter of admission from German university (can submit later)'],sp:['Study Scholarship for Graduates (all fields)','EPOS (for experienced professionals, 2+ yrs)','STEM-specific scholarships available'],uni:['Any German public university \u2014 tuition free (e.g., TU Munich DS, TU Berlin ML, TU Darmstadt CS)'],cur:'Independent study at chosen German university + DAAD-funded living stipend.',proc:'Jun-Aug 2027: Find programme + apply for admission. Aug-Sep 2027: Submit DAAD application. Oct-Dec 2027: Results. Travel for Winter 2027 or Summer 2028 intake.',tips:['Can apply in final year of Bachelor. German language (even A1) strengthens application significantly. DAAD scholarship is separate from university admission \u2014 you need both. EPOS requires 2+ years work experience which you meet. Best backup because deadline is much later (Aug 2027) than Erasmus/Fulbright/Chevening.'],why:['Bangladesh qualifies as developing country','Tuition-free German universities + monthly stipend','Data Science at TU Munich / ML at TU Berlin are options','Later deadline = good backup while waiting for other results']},
+     {id:'fulbright',n:'Fulbright',f:'Fulbright \u2014 USA Government',cat:'Government',bg:'bdg-r',fo:'Any field \u2014 Stats, DS, AI, ML',lo:'USA',dl:'~11 Jul 2026 (URGENT!)',du:'1-2 years',st:'$1,800-2,500/mo',sc:'~15-25 from Bangladesh',fq:'Sep 2027',ap:'apply.iie.org/ffsp2027',de:'Flagship US government scholarship. Full tuition + living stipend + airfare + health insurance at any US university. Must return to Bangladesh for minimum 2 years after completion (J-1 visa 212(e) requirement). ~15-25 Bangladeshis selected annually. No binational Fulbright Commission in Bangladesh \u2014 US Embassy Dhaka administers.',ur:'https://bd.usembassy.gov/',mc:'#fb7185',mp:80,el:['Bangladeshi citizen residing in Bangladesh','4-year BSc with strong grades','2+ years full-time POST-BACHELOR professional experience (hard requirement)','TOEFL iBT 90+ / IELTS 7.0+','No prior US degree','No foreign Master\'s degree'],doc:['Online application via apply.iie.org/ffsp2027','Academic transcripts + certificates from all post-secondary institutions','3 reference letters (submitted via portal)','Academic Records Information Form','Personal Statement (~1500 words / ~2 pages)','Study/Research Objective','CV/Resume','Valid passport scan','TOEFL/IELTS (do NOT register early \u2014 embassy may provide vouchers if shortlisted)','GRE/GMAT (recommended if available)'],sp:['Artificial Intelligence & Computer Science','Mathematics & Statistics','Data Science','Cybersecurity','Any field supported with strong study plan'],uni:['Any US university (placement facilitated by Fulbright)'],cur:'1-2 year Master\'s at US university. Includes pre-academic orientation + leadership enrichment programme + cultural exchange activities.',proc:'Apply May-Jun -> Deadline 11 Jul 2026 -> Shortlisting Aug -> Interview at US Embassy Dhaka (Aug-Oct) -> University placement (Nov-May) -> Depart Aug-Sep 2027.',tips:['JUL 11 DEADLINE \u2014 start essays NOW. Personal Statement (your story, Bangladesh context) + Study Objective (specific field, research questions, Bangladesh career plan). DON\'T register TOEFL early \u2014 embassy may pay after shortlisting. Junior faculty get priority but private sector (ML Engineer) accepted. Show leadership + volunteer work. Interview panel asks directly about 2-year return plan. 15-25 out of several hundred applicants (~5-10% rate). Apply alongside Erasmus \u2014 no conflict.'],why:['Full tuition + stipend + airfare + insurance','Prestigious \u2014 opens global career doors','2+ yrs ML Engineer meets hard work req','Leadership programme included']},
+     {id:'chevening',n:'Chevening',f:'Chevening \u2014 UK Government',cat:'Government',bg:'bdg-a',fo:'Any field \u2014 DS, AI, ML (1-year taught Master\'s)',lo:'United Kingdom',dl:'~Early Nov 2026 (noon GMT)',du:'1 year',st:'\u00a31,378-1,690/mo',sc:'~22-23 from Bangladesh',fq:'Sep-Oct 2027',ap:'chevening.org/apply',de:'UK Government global scholarship (FCDO). Full tuition + monthly stipend + travel + visa + arrival allowance. 50,000+ alumni globally. ~22-23 Bangladeshis selected annually since 1983 (372 total). British High Commission Dhaka administers.',ur:'https://www.chevening.org/',mc:'#fbbf24',mp:75,el:['Bangladeshi citizen','BSc degree enabling entry to UK Master\'s','2,800+ hours POST-GRADUATION work experience (hard minimum, can combine up to 15 periods including full-time, part-time, paid/unpaid internships, voluntary work)','Apply to 3 eligible UK universities','Unconditional UK university offer by ~Jul 2027','Return to Bangladesh for 2 years after','BSc must be completed at least 2 years before deadline (graduated by ~Nov 2024)'],doc:['Online application at chevening.org/apply','Bachelor degree + transcripts','CV (leadership focused, 2 pages)','4 essays (500 words max, 100 words min each): Leadership & Influence, Networking, Studying in UK, Career Plan','2 reference letters (1 professional + 1 academic/professional — submitted via structured Chevening form)','IELTS 6.5+ (6.0 each band) or meet UK uni requirement','Unconditional UK university offer (by ~Jul 2027)','TB test + police clearance (later stage)'],sp:['Any 1-year taught Master\'s at any UK university'],uni:['Any eligible UK university (top choices: Imperial ML, UCL Data Science, Edinburgh AI, Cambridge MPhil, Oxford MSc Stats/CS, KCL, Manchester, Southampton, Bristol, Glasgow)'],cur:'1-year UK Master\'s + Chevening networking events, leadership workshops, alumni programme, access to 50,000+ global network.',proc:'Aug 2026: Apply to 3 UK universities -> Aug-Nov: Write 4 essays -> ~Early Nov 2026: Deadline (noon GMT = 18:00 BST) -> Nov-Jan: Reading committee -> Mid-Feb: Interview shortlist -> Mar-Apr: Interview at British High Commission Dhaka -> Mid-Jun: Final results -> ~Jul 2027: Unconditional offer deadline -> Sep-Oct 2027: Depart.',tips:['FOUR essays now (was 3). Leadership essay is most important \u2014 use STAR method with concrete examples. Deadline is NOON GMT, not midnight (18:00 Bangladesh time). Apply to UK universities BEFORE Chevening results. 2,800 hrs can combine ML Engineer + any part-time + volunteering. Leadership outside work (volunteering, mentoring, organising) is highly valued. Connect application to Bangladesh\'s priorities (flood prediction, agriculture, healthcare, financial inclusion via AI). Connect with Chevening alumni on LinkedIn. Must graduate BSc by ~Nov 2024 for 2,800 hrs eligibility.'],why:['Full tuition + generous living stipend','Prestigious UK government programme','50,000+ strong alumni network','PM + ML Engineer leadership experience fits Chevening values','22-23 BDs selected annually \u2014 realistic chance']},
+    {id:'commonwealth',n:'Commonwealth',f:'Commonwealth Master\'s \u2014 UK',cat:'Government',bg:'bdg-sky',fo:'Any field \u2014 DS, AI, Stats, ML',lo:'United Kingdom',dl:'~Oct 2026 (UGC); ~Dec 2026 (Shared Scholars)',du:'1 year',st:'\u00a31,378-1,690/mo',sc:'~700 total across Commonwealth',fq:'Sep-Oct 2027',ap:'CSC EAS via UGC Bangladesh',de:'UK Government scholarship (FCDO) for Commonwealth citizens. Full tuition + monthly stipend + airfare + research support grant + arrival allowance. Bangladesh eligible. Apply through UGC Bangladesh, not directly to CSC.',ur:'https://cscuk.fcdo.gov.uk/scholarships/commonwealth-masters-scholarships/',mc:'#38bdf8',mp:78,el:['Bangladeshi citizen (permanent resident)','First degree at least upper 2nd class (2:1) honours equivalent','Or lower 2nd class (2:2) + relevant postgraduate qualification','Unable to afford UK study without scholarship','Available to start by Sep 2027'],doc:['CSC Electronic Application System (EAS) submission','Valid passport copy (or national ID)','Degree certificate + transcripts','2 reference letters (uploaded by deadline)','Proof of citizenship/permanent residency','University admission letter (if available)'],sp:['Any Master\'s programme aligned with Bangladesh development priorities'],uni:['Any eligible UK university (on CSC list)'],cur:'1-year Master\'s. Must demonstrate how studies contribute to Bangladesh development. Includes research support grant.',proc:'May-Aug: CSC publishes call -> Aug-Sep: Apply to UK universities -> Oct: EAS via UGC -> Dec: Shared Scholarship direct (alternative route) -> Mar-Apr: Results -> Sep 2027: Depart.',tips:['Apply via UGC Bangladesh (NOT directly). 2:1 equivalent needed (CGPA 3.0+/4.0 likely meets it). Development impact is the KEY criterion. Can apply alongside Chevening \u2014 no conflict. Shared Scholarship in Dec = second chance for partnered unis.'],why:['Bangladesh is eligible Commonwealth country','Full tuition + stipend + airfare + grants','Development impact matches ML for social good','Can apply alongside Chevening']}
+  ]
+};
+
+var CAT = {emai:'Erasmus Mundus',deai:'Erasmus Mundus',im:'Erasmus Mundus',ediss:'Erasmus Mundus',aiss:'Erasmus Mundus',md:'Erasmus Mundus',cosse:'Erasmus Mundus',mbzuai:'Fellowship',daad:'Government',fulbright:'Government',chevening:'Government',commonwealth:'Government'};
+var D = SCHOLARSHIP_DATA;
+var P = D.programs;
+var TL = D.timelines;
+
+function getTL(k){ return TL[k] || []; }
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('on');
+  document.body.style.overflow = '';
+}
+function openModal(id){
+  var p = P.find(function(x){return x.id===id});
+  if(!p) return;
+  var h = '<button class="modal-close" onclick="closeModal()">\u00d7</button><div class="st"><span class="bdg '+p.bg+'" style="font-size:.7rem;vertical-align:middle;margin-right:8px">'+p.n+' &middot; '+CAT[p.id]+'</span>'+p.n+'</div><div class="sd" style="margin-top:4px">'+p.f+'</div><div class="modal-grid">';
+  h += '<div class="modal-field"><div class="lbl">Category</div><div class="val">'+CAT[p.id]+'</div></div>';
+  h += '<div class="modal-field"><div class="lbl">Monthly</div><div class="val">'+p.st+'</div></div>';
+  h += '<div class="modal-field"><div class="lbl">Duration</div><div class="val">'+p.du+'</div></div>';
+  h += '<div class="modal-field"><div class="lbl">Slots</div><div class="val">'+p.sc+'</div></div>';
+  h += '<div class="modal-field"><div class="lbl">Deadline</div><div class="val">'+p.dl+'</div></div>';
+  h += '<div class="modal-field"><div class="lbl">Next Intake</div><div class="val">'+p.fq+'</div></div></div>';
+  h += '<div class="modal-section"><h4>Description</h4><p style="color:#94a3b8;font-size:.88rem;line-height:1.6">'+p.de+'</p></div>';
+  h += '<div class="modal-section"><h4>Eligibility</h4><div class="val"><ul>'+p.el.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+  h += '<div class="modal-section"><h4>Documents</h4><div class="val"><ul>'+p.doc.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+  if(p.sp) h += '<div class="modal-section"><h4>Specialisations</h4><div class="val"><ul>'+p.sp.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+  if(p.uni) h += '<div class="modal-section"><h4>Host Universities</h4><div class="val"><ul>'+p.uni.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+  if(p.cur) h += '<div class="modal-section"><h4>Curriculum</h4><p style="color:#94a3b8;font-size:.88rem;line-height:1.6">'+p.cur+'</p></div>';
+  if(p.proc) h += '<div class="modal-section"><h4>Application Process</h4><p style="color:#94a3b8;font-size:.88rem;line-height:1.6">'+p.proc+'</p></div>';
+  if(p.tips) h += '<div class="modal-section"><h4>Tips</h4><div class="val"><ul>'+p.tips.map(function(x){return '<li>'+x+'</li>'}).join('')+'</ul></div></div>';
+  h += '<div class="modal-section" style="display:flex;gap:10px;flex-wrap:wrap"><a href="'+p.ur+'" target="_blank" class="btn btn-p">Official Website</a><a href="../guides/motivation-letter-template.md" target="_blank" class="btn">Letter Template</a></div>';
+  document.getElementById('modalContent').innerHTML = h;
+  document.getElementById('modalOverlay').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+
+function makeCards(prog){
+  return prog.sort(function(a,b){return b.mp-a.mp}).map(function(p){
+    return '<div class="cd" onclick="openModal(\''+p.id+'\')"><span class="bdg '+p.bg+'">'+p.n+' &middot; '+CAT[p.id]+'</span><h3>'+p.n+'</h3><div class="sub">'+p.f+'</div><div class="mm"><div class="fl" style="width:'+p.mp+'%;background:'+p.mc+'"></div></div><p style="margin-top:6px">'+p.de+'</p><div class="sr"><div class="s"><div class="n">'+p.st+'</div><div class="l">Stipend</div></div><div class="s"><div class="n">'+p.du+'</div><div class="l">Duration</div></div><div class="s"><div class="n">'+p.sc+'</div><div class="l">Slots</div></div></div><div><strong style="font-size:.8rem;color:#94a3b8">Why fits you:</strong></div><ul>'+(p.why?p.why.slice(0,3).map(function(w){return '<li>'+w+'</li>'}).join(''):'')+'</ul></div>';
+  }).join('');
+}
+
+function fillTL(id, arr){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.innerHTML = arr.map(function(t){return '<div class="tli"><div class="d">'+t.d+'</div><div class="t">'+t.t+'</div><div class="dc">'+t.c+'</div></div>'}).join('');
+}
+
+function renderAll(){
+  document.getElementById('allSd').textContent = 'All ' + P.length + ' scholarships. Sorted by fit. Data: ' + D.lastUpdated;
+  document.getElementById('allList').innerHTML = makeCards(P);
+  fillTL('allTimeline', getTL('all'));
+}
+function erasmusCards(filter){
+  var list = filter==='all' ? P.filter(function(p){return CAT[p.id]==='Erasmus Mundus'}) : P.filter(function(p){return p.id===filter});
+  document.getElementById('erasmusSd').textContent = 'Data: ' + D.lastUpdated;
+  if(list.length===0){ document.getElementById('erasmusList').innerHTML='<p style="color:#475569">Select a programme.</p>'; return; }
+  document.getElementById('erasmusList').innerHTML = makeCards(list);
+  fillTL('erasmusTimeline', getTL('erasmus'));
+}
+function renderSingle(catId, listId, sdId, tlId, tlKey){
+  document.getElementById(sdId).textContent = 'Data: ' + D.lastUpdated;
+  var prog = P.filter(function(p){return p.id===catId});
+  document.getElementById(listId).innerHTML = prog.length ? makeCards(prog) : '<p style="color:#475569">No data.</p>';
+  fillTL(tlId, getTL(tlKey));
+}
+
+function refreshData(){
+  var btn = document.getElementById('refreshBtn');
+  btn.classList.add('loading');
+  btn.disabled = true;
+  var ts = document.getElementById('tsDisplay');
+  ts.textContent = 'Refreshing data...';
+
+  // Try XHR first (works in Firefox/Edge on file://)
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'scholarship-data.js?_t=' + Date.now(), true);
+  xhr.onload = function(){
+    if(xhr.status === 200 || xhr.status === 0){
+      try{
+        // Extract the SCHOLARSHIP_DATA variable from the file
+        var text = xhr.responseText;
+        var match = text.match(/var\s+SCHOLARSHIP_DATA\s*=\s*(\{[\s\S]*?\});/);
+        if(match){
+          var newData = new Function('return ' + match[1])();
+          if(newData && newData.programs){
+            SCHOLARSHIP_DATA = newData;
+            D = newData; P = D.programs; TL = D.timelines;
+            ts.textContent = 'Last updated: ' + (D.lastUpdated||'N/A');
+            reRenderAll();
+            btn.classList.remove('loading');
+            btn.disabled = false;
+            return;
+          }
+        }
+      } catch(e){}
+    }
+    // Fallback: try script injection
+    tryScriptRefresh(btn, ts);
+  };
+  xhr.onerror = function(){
+    tryScriptRefresh(btn, ts);
+  };
+  xhr.send();
+}
+
+function tryScriptRefresh(btn, ts){
+  var old = document.getElementById('_refresh_script');
+  if(old) old.parentNode.removeChild(old);
+  var s = document.createElement('script');
+  s.id = '_refresh_script';
+  s.src = 'scholarship-data.js?_t=' + Date.now();
+  s.onload = function(){
+    if(typeof SCHOLARSHIP_DATA !== 'undefined' && SCHOLARSHIP_DATA.programs){
+      D = SCHOLARSHIP_DATA; P = D.programs; TL = D.timelines;
+      ts.textContent = 'Last updated: ' + (D.lastUpdated||'N/A');
+      reRenderAll();
+    } else {
+      ts.textContent = 'Data file loaded but no data found.';
+    }
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  };
+  s.onerror = function(){
+    ts.textContent = 'Refresh failed. Run refresh-data.ps1 and reopen the page.';
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  };
+  document.body.appendChild(s);
+}
+
+function reRenderAll(){
+  renderAll();
+  erasmusCards('all');
+  ['mbzuai','daad','fulbright','chevening','commonwealth'].forEach(function(id){renderSingle(id,id+'List',id+'Sd',id+'Timeline',id);});
+}
+
+renderAll();
+erasmusCards('all');
+['mbzuai','daad','fulbright','chevening','commonwealth'].forEach(function(id){renderSingle(id,id+'List',id+'Sd',id+'Timeline',id);});
+document.getElementById('tsDisplay').textContent = 'Last updated: ' + D.lastUpdated;
+
+// Tab switching
+document.querySelectorAll('#tabs button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#tabs button').forEach(function(x){x.classList.remove('on')});
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    document.getElementById('tab-'+b.dataset.t).classList.add('on');
+  });
+});
+document.querySelectorAll('#erasmusCat button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#erasmusCat button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    erasmusCards(b.dataset.c);
+  });
+});
+
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function inl(s){
+  return s.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\*(.+?)\*/g,'<i>$1</i>').replace(/`(.+?)`/g,'<code>$1</code>').replace(/\[(.+?)\]\((.+?)\)/g,'<a href="$2" target="_blank">$1</a>');
+}
+function mdToHtml(md){
+  var h = '', lines = md.split('\n'), inTable = false;
+  for(var i = 0; i < lines.length; i++){
+    var l = lines[i], t = l.replace(/\r/g,'').trim();
+    if(!t){ if(inTable){ h += '</tbody></table>'; inTable = false; } h += '<p>'; continue; }
+    var m;
+    if(m = t.match(/^(#{1,4})\s+(.+)/)){ h += '<h'+m[1].length+'>'+inl(esc(m[2]))+'</h'+m[1].length+'>'; continue; }
+    if(t.match(/^- \[ \] /)){ h += '<li><input type="checkbox" disabled> '+inl(esc(t.slice(6)))+'</li>'; continue; }
+    if(t.match(/^- \[[xX]\] /)){ h += '<li><input type="checkbox" disabled checked> '+inl(esc(t.slice(6)))+'</li>'; continue; }
+    if(t.match(/^[-*]\s/)){ h += '<li>'+inl(esc(t.replace(/^[-*]\s+/,'')))+'</li>'; continue; }
+    if(t.match(/^\d+\.\s/)){ h += '<li>'+inl(esc(t.replace(/^\d+\.\s+/,'')))+'</li>'; continue; }
+    if(t.charAt(0)==='|'){
+      if(!inTable){ inTable = true; var cells = t.split('|').filter(Boolean); h += '<table><thead><tr>'; for(var ci=0;ci<cells.length;ci++) h += '<th>'+inl(esc(cells[ci].trim()))+'</th>'; h += '</tr></thead><tbody>'; }
+      else if(t.match(/^[\|\s:-]+$/)){}
+      else { var cs = t.split('|').filter(Boolean); h += '<tr>'; for(var ci=0;ci<cs.length;ci++) h += '<td>'+inl(esc(cs[ci].trim()))+'</td>'; h += '</tr>'; }
+      continue;
+    }
+    if(inTable){ h += '</tbody></table>'; inTable = false; }
+    if(t.charAt(0)==='>'){ h += '<blockquote>'+inl(esc(t.replace(/^>\s*/,'')))+'</blockquote>'; continue; }
+    if(t.match(/^[-*_]{3,}$/)) continue;
+    h += inl(esc(l.replace(/\r/g,''))) + '<br>';
+  }
+  if(inTable) h += '</tbody></table>';
+  return '<div class="res-p">'+h+'</div>';
+}
+function openResource(key, title){
+  var m = document.getElementById('modalContent');
+  if(key === 'programs'){
+    m.innerHTML = '<button class="modal-close" onclick="closeModal()">\u00d7</button><div class="st">Program Guides</div><div class="sd">8 detailed program files in the programs/ folder</div><br><a href="../programs/" target="_blank" class="btn btn-p">Open programs folder</a>';
+    document.getElementById('modalOverlay').classList.add('on');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+  var content = RESOURCES[key];
+  if(!content){
+    m.innerHTML = '<button class="modal-close" onclick="closeModal()">\u00d7</button><div class="st">'+title+'</div><div class="sd">Content not found.</div>';
+    document.getElementById('modalOverlay').classList.add('on');
+    document.body.style.overflow = 'hidden';
+    return;
+  }
+  var decoded = decodeURIComponent(Array.prototype.map.call(atob(content),function(c){return '%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)}).join(''));
+  m.innerHTML = '<button class="modal-close" onclick="closeModal()">\u00d7</button><div class="st">'+title+'</div><div id="resContent" style="max-height:70vh;overflow-y:auto;padding:8px 0">'+mdToHtml(decoded)+'</div>';
+  document.getElementById('modalOverlay').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+</script>
+</body>
+</html>

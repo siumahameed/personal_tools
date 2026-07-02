@@ -1,7 +1,9 @@
 """Tests for target.py regex extraction functions."""
 import sys
 import os
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_test_root = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _test_root)
+sys.path.insert(0, os.path.join(_test_root, 'src'))
 
 from agents.target import (
     AMOUNT_RE, DEADLINE_RE, TUITION_RE, TOEFL_RE, GRE_RE,

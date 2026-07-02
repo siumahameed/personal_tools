@@ -1,6 +1,8 @@
 """Add 70+ scholarships from 30+ new countries worldwide."""
 import sys, os, json
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_aws = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_aws)
+sys.path.insert(0, os.path.join(_script_root_aws, 'src'))
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 

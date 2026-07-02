@@ -1,5 +1,9 @@
 """Remove Middle Eastern countries from scholarships and professors."""
-import json, os
+import json, os, sys
+
+_script_root_rm = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_rm)
+sys.path.insert(0, os.path.join(_script_root_rm, 'src'))
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 ME = {'UAE','Saudi Arabia','Qatar','Israel','Oman','Egypt','Turkey'}

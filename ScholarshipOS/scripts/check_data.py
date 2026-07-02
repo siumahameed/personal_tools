@@ -1,6 +1,8 @@
 """Check current data and verify app startup."""
 import sys, os, json
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_cd = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_cd)
+sys.path.insert(0, os.path.join(_script_root_cd, 'src'))
 
 from data.data_loader import load_core_scholarships, load_core_universities, load_core_professors
 

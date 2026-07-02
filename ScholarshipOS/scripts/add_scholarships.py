@@ -1,6 +1,8 @@
 """Add scholarships for South Asian (Bangladesh, India, Pakistan) students."""
 import sys, os, json
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_as = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_as)
+sys.path.insert(0, os.path.join(_script_root_as, 'src'))
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 

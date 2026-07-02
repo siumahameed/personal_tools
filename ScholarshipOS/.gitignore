@@ -1,20 +1,51 @@
-# Scraped data (JSON only)
-data/*.json
-!data/data_loader.py
-
-# Credentials & secrets
+# Service Account Credentials (CRITICAL SECURITY)
 credentials.json
-.env
+*.pem
+*.key
 
-# Python cache
+# Python Cache & Environment Files
 __pycache__/
-*.pyc
-.pytest_cache/
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv
+venv/
+ENV/
+env/
+.env
+.env.*
+!.env.example
 
-# Frontend build
-frontend/node_modules/
-frontend/dist/
+# Local Agent Database Data
+data/*.json
+data/*.db
+data/*.db-shm
+data/*.db-wal
+tmp_*.txt
 
-# Temp files
-tmp_*
-*.lock
+# Node/Vite Frontend
+web/frontend/node_modules/
+web/frontend/dist/
+web/frontend/.cache/
+web/frontend/npm-debug.log*
+web/frontend/yarn-debug.log*
+web/frontend/yarn-error.log*
+web/frontend/.pnp*
+web/frontend/.pnp.js
+
+# Temp / Scratch files
+tmp/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+*.swo
+
+# OS temporary files
+.DS_Store
+Thumbs.db

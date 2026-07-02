@@ -4,7 +4,9 @@ import sys
 import os
 import json
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_script_root_mdtj = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _script_root_mdtj)
+sys.path.insert(0, os.path.join(_script_root_mdtj, 'src'))
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data")
 os.makedirs(DATA_DIR, exist_ok=True)

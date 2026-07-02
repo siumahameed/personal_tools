@@ -26,13 +26,15 @@ except Exception:
     pass
 
 sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "src"))
 
+ROOT_DIR = os.path.dirname(__file__)
 
 def get_sheets_client():
-    creds_path = os.path.join(os.path.dirname(__file__), "credentials.json")
+    creds_path = os.path.join(ROOT_DIR, "credentials.json")
     if os.path.exists(creds_path):
         from config import SHEETS_CONFIG
-        from storage.sheets import GoogleSheetsClient
+        from src.storage.sheets import GoogleSheetsClient
         return GoogleSheetsClient(creds_path, SHEETS_CONFIG["spreadsheet_id"])
     return None
 
@@ -47,10 +49,10 @@ def main():
 
     if args.web:
         print("Starting Web Dashboard...")
-        os.chdir(os.path.dirname(__file__))
+        os.chdir(ROOT_DIR)
         import uvicorn
         import atexit
-        lock_file = os.path.join(os.path.dirname(__file__), ".dashboard.lock")
+        lock_file = os.path.join(ROOT_DIR, ".dashboard.lock")
         if os.path.exists(lock_file):
             try:
                 os.remove(lock_file)
@@ -72,14 +74,14 @@ def main():
         except Exception:
             pass
         reload_mode = os.environ.get("SCHOLARAI_ENV", "development") == "development"
-        uvicorn.run("dashboard.app:app", host="0.0.0.0", port=5000, reload=reload_mode)
+        uvicorn.run("src.dashboard.app:app", host="0.0.0.0", port=5000, reload=reload_mode)
     elif args.scan:
-        from orchestrator import Orchestrator
+        from src.orchestrator import Orchestrator
         orch = Orchestrator(sheets, interactive=False)
         orch.show_welcome()
         orch.run_all()
     else:
-        from orchestrator import Orchestrator
+        from src.orchestrator import Orchestrator
         orch = Orchestrator(sheets)
         orch.show_welcome()
         orch.menu()

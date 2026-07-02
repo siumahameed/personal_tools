@@ -2,7 +2,9 @@
 import sys
 import os
 from datetime import datetime, timedelta
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+_test_root = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, _test_root)
+sys.path.insert(0, os.path.join(_test_root, 'src'))
 
 from features.deadlines import DeadlineTracker
 
